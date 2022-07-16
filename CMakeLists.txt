@@ -12,3 +12,4 @@ pico_sdk_init()
 
 # Add subdirectories:
 add_subdirectory(test)
+add_subdirectory(hello_gpio_irq)
