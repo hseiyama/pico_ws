@@ -28,6 +28,8 @@ int main() {
 
     // Set period of 25000 cycles (0 to 24999 inclusive)
     pwm_set_wrap(slice_num, PWM_SLICE_3_CYCLE - 1);
+    // Set period of 0.2[ms] -> 0.02[s]
+    pwm_set_clkdiv(slice_num, 100.0);
     // Set channel A output high for 6250 cycle (1/4) before dropping
     pwm_set_chan_level(slice_num, PWM_CHAN_A, PWM_CHAN_3A_DUTY);
     // Set initial B output high for 18750 cycles (3/4) before dropping
