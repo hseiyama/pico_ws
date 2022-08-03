@@ -13,6 +13,7 @@
 #define PWM_CHAN_3B_GPIO_7 (7)
 
 #define PWM_SLICE_3_CYCLE (25000)   // 周期：125[Mhz]/25000=5[Khz]->0.2[ms]
+#define PWM_SLICE_3_CLKDIV (100.0)  // 分周比：周期 5[Khz]/100.0=50[hz]->0.02[s]
 #define PWM_CHAN_3A_DUTY (6250)     // Duty比：25%(1/4)
 #define PWM_CHAN_3B_DUTY (18750)    // Duty比：75%(3/4)
 
@@ -29,7 +30,7 @@ int main() {
     // Set period of 25000 cycles (0 to 24999 inclusive)
     pwm_set_wrap(slice_num, PWM_SLICE_3_CYCLE - 1);
     // Set period of 0.2[ms] -> 0.02[s]
-    pwm_set_clkdiv(slice_num, 100.0);
+    pwm_set_clkdiv(slice_num, PWM_SLICE_3_CLKDIV);
     // Set channel A output high for 6250 cycle (1/4) before dropping
     pwm_set_chan_level(slice_num, PWM_CHAN_A, PWM_CHAN_3A_DUTY);
     // Set initial B output high for 18750 cycles (3/4) before dropping
