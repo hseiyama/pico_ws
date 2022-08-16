@@ -56,7 +56,7 @@ void tgt_main() {
     if(bla_in_btn_value) {
         bla_out_led_value = bls_led_value;
     } else {
-        bla_out_led_value = true;
+        bla_out_led_value = !bls_led_value;
     }
 
     // GPIO(GP7)の出力
