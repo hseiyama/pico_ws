@@ -18,38 +18,53 @@ static volatile uint64_t u64s_timer_sys;
 static volatile uint8_t u8s_timer_5ms;
 static struct sys_time sts_timer_1000ms;
 
-static bool sys_timer_callback(struct repeating_timer *);
+static void tgt_init();
+static void tgt_timer_1ms();
+static void tgt_main();
 static void sys_init();
 static void sys_main_1ms();
 static void sys_main_5ms();
+static bool sys_timer_callback(struct repeating_timer *);
 static void sys_timer_start(struct sys_time *);
 static void sys_timer_stop(struct sys_time *);
 static bool sys_timer_check(struct sys_time *, uint64_t);
 static uint64_t sys_timer_diff(struct sys_time *, uint64_t);
 static bool sys_timer_isrun(struct sys_time *);
 
-static bool sys_timer_callback(struct repeating_timer *sta_repeat_timer) {
-    u64s_timer_sys++;
-    u8s_timer_5ms++;
-    sys_main_1ms();
-    return true;
+static void tgt_init() {
+    stdio_init_all();
+    sys_timer_start(&sts_timer_1000ms);
+}
+
+static void tgt_timer_1ms() {
+}
+
+static void tgt_main() {
+    if(sys_timer_check(&sts_timer_1000ms, 1000)) {
+        printf("sys_timer_check: 1000ms Pass(%lld)\n", time_us_64());
+        sys_timer_start(&sts_timer_1000ms);
+    }
 }
 
 static void sys_init() {
     u64s_timer_sys = 0;
     u8s_timer_5ms = 0;
-    stdio_init_all();
-    sys_timer_start(&sts_timer_1000ms);
+    tgt_init();
 }
 
 static void sys_main_1ms() {
+    tgt_timer_1ms();
 }
 
 static void sys_main_5ms() {
-    if(sys_timer_check(&sts_timer_1000ms, 1000)) {
-        printf("sys_timer_check: 1000ms Pass(%lld)\n", time_us_64());
-        sys_timer_start(&sts_timer_1000ms);
-    }
+    tgt_main();
+}
+
+static bool sys_timer_callback(struct repeating_timer *sta_repeat_timer) {
+    u64s_timer_sys++;
+    u8s_timer_5ms++;
+    sys_main_1ms();
+    return true;
 }
 
 void main() {
