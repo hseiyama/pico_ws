@@ -1,5 +1,6 @@
 add_executable(framework
         sys_main.c
+        tgt_main.c
         )
 
 # pull in common dependencies
