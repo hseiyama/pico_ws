@@ -10,17 +10,8 @@ static struct sys_time sts_timer_1000ms;
 static bool bls_led_value;
 
 static void tgt_init_port();
-
-static void tgt_init_port() {
-    // GPIO(GP2)の初期設定（ポート入力：プルアップ）
-    gpio_init(BTN_GPIO_2);
-    gpio_set_dir(BTN_GPIO_2, GPIO_IN);
-    gpio_pull_up(BTN_GPIO_2);
-    // GPIO(GP7)の初期設定（ポート出力）
-    gpio_init(LED_GPIO_7);
-    gpio_set_dir(LED_GPIO_7, GPIO_OUT);
-    gpio_put(LED_GPIO_7, bls_led_value);
-}
+static void tgt_read_btn_value(bool *);
+static void tgt_write_led_value(bool);
 
 void tgt_init() {
     bls_led_value = false;
@@ -39,8 +30,8 @@ void tgt_main() {
     bool bla_in_btn_value;
     bool bla_out_led_value;
 
-    // GPIO(GP2)の入力
-    bla_in_btn_value = gpio_get(BTN_GPIO_2);
+    // 入力処理
+    tgt_read_btn_value(&bla_in_btn_value);
 
     // 1000msタイマーが満了した場合
     if(sys_timer_check(&sts_timer_1000ms, 1000)) {
@@ -59,6 +50,45 @@ void tgt_main() {
         bla_out_led_value = !bls_led_value;
     }
 
+    // 出力処理
+    tgt_write_led_value(bla_out_led_value);
+}
+
+static void tgt_init_port() {
+    // GPIO(GP2)の初期設定（ポート入力：プルアップ）
+    gpio_init(BTN_GPIO_2);
+    gpio_set_dir(BTN_GPIO_2, GPIO_IN);
+    gpio_pull_up(BTN_GPIO_2);
+    // GPIO(GP7)の初期設定（ポート出力）
+    gpio_init(LED_GPIO_7);
+    gpio_set_dir(LED_GPIO_7, GPIO_OUT);
+    gpio_put(LED_GPIO_7, bls_led_value);
+}
+
+static void tgt_read_btn_value(bool *pbla_btn_value) {
+    static bool bls_btn_value_filter = true;
+    static uint8_t u8s_count_filter = 0;
+    bool bla_btn_value_temp;
+
+    // GPIO(GP2)の入力
+    bla_btn_value_temp = gpio_get(BTN_GPIO_2);
+    // ポート値が変化している場合
+    if(bla_btn_value_temp != bls_btn_value_filter) {
+        u8s_count_filter++;
+        // 4回連続でポート値の変化が継続している場合
+        if(u8s_count_filter >= 4) {
+            u8s_count_filter = 0;
+            bls_btn_value_filter = bla_btn_value_temp;
+        }
+    // ポート値に変化がない場合
+    } else {
+        u8s_count_filter = 0;
+    }
+    // 戻り値の設定
+    *pbla_btn_value = bls_btn_value_filter;
+}
+
+static void tgt_write_led_value(bool bla_led_value) {
     // GPIO(GP7)の出力
-    gpio_put(LED_GPIO_7, bla_out_led_value);
+    gpio_put(LED_GPIO_7, bla_led_value);
 }
