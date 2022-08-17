@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/uart.h"
 #include "sys_main.h"
 #include "tgt_main.h"
 
-#define LED_GPIO_7 (7)
-#define BTN_GPIO_2 (2)
+#define UART0_ID        uart0
+#define UART0_TX_GP0    (0)
+#define UART0_RX_GP1    (1)
+#define LED_GPIO_7      (7)
+#define BTN_GPIO_2      (2)
 
 static struct sys_time sts_timer_1000ms;
 static bool bls_led_value;
 
 static void tgt_init_port();
+static void tgt_init_uart();
 static void tgt_read_btn_value(bool *);
 static void tgt_write_led_value(bool);
 
@@ -19,6 +24,8 @@ void tgt_init() {
     stdio_init_all();
     // ポートの初期設定
     tgt_init_port();
+    // UARTの初期設定
+    tgt_init_uart();
     // 1000msタイマーの開始
     sys_timer_start(&sts_timer_1000ms);
 }
@@ -27,6 +34,7 @@ void tgt_timer_1ms() {
 }
 
 void tgt_main() {
+    static uint8_t au8s_message[64];
     bool bla_in_btn_value;
     bool bla_out_led_value;
 
@@ -38,7 +46,8 @@ void tgt_main() {
         // GPIO(GP7)の出力用の保持値を反転する
         bls_led_value = !bls_led_value;
         // 標準出力に実行進捗を出力
-        printf("sys_timer_check: 1000ms Pass(%lld)\n", time_us_64());
+        snprintf(au8s_message, sizeof(au8s_message), "sys_timer_check: 1000ms Pass(%lld)\r\n", time_us_64());
+        uart_puts(UART0_ID, au8s_message);
         // 1000msタイマーの再開
         sys_timer_start(&sts_timer_1000ms);
     }
@@ -63,6 +72,12 @@ static void tgt_init_port() {
     gpio_init(LED_GPIO_7);
     gpio_set_dir(LED_GPIO_7, GPIO_OUT);
     gpio_put(LED_GPIO_7, bls_led_value);
+}
+
+static void tgt_init_uart() {
+    uart_init(UART0_ID, 115200);
+    gpio_set_function(UART0_TX_GP0, GPIO_FUNC_UART);
+    gpio_set_function(UART0_RX_GP1, GPIO_FUNC_UART);
 }
 
 static void tgt_read_btn_value(bool *pbla_btn_value) {
