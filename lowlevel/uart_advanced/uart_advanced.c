@@ -37,6 +37,7 @@ void on_uart_rx() {
         }
         chars_rxed++;
     }
+    uart_putc(UART_ID, 'Q');
 }
 
 int main() {
