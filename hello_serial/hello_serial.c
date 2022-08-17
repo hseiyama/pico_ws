@@ -9,6 +9,10 @@
 
 #define BUTTON_GPIO (2)
 #define LED_GPIO  PICO_DEFAULT_LED_PIN
+#define LED_GPIO_7 (7)
+
+static u_int64_t u16_time;
+static u_int64_t u16_diff;
 
 int main() {
     unsigned char count = 0;
@@ -23,6 +27,9 @@ int main() {
     /* LED出力用のポート設定 */
     gpio_init(LED_GPIO);
     gpio_set_dir(LED_GPIO, GPIO_OUT);
+    gpio_init(LED_GPIO_7);
+    gpio_set_dir(LED_GPIO_7, GPIO_OUT);
+    gpio_put(LED_GPIO_7, false);
 
     while (true) {
         count++;
@@ -37,7 +44,11 @@ int main() {
             gpio_put(LED_GPIO, false);
         }
 
+        u16_time = time_us_64();
+        gpio_put(LED_GPIO_7, true);
         printf("Hello, world! (serial-%d)%s\n", count, message);
+        gpio_put(LED_GPIO_7, false);
+        u16_diff = time_us_64() - u16_time;
         sleep_ms(1000);
     }
     return 0;
