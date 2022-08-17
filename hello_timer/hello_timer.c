@@ -9,6 +9,7 @@
 
 /// \tag::timer_example[]
 volatile bool timer_fired = false;
+uint8_t param = 3;
 
 int64_t alarm_callback(alarm_id_t id, void *user_data) {
     printf("Timer %d fired!\n", (int) id);
@@ -19,6 +20,10 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
 
 bool repeating_timer_callback(struct repeating_timer *t) {
     printf("Repeat at %lld\n", time_us_64());
+    if(t->user_data != NULL){
+        uint8_t tmp = *(uint8_t *)(t->user_data);
+        printf("  param = %d\n", tmp);
+    }
     return true;
 }
 
@@ -47,7 +52,7 @@ int main() {
 
     // Negative delay so means we will call repeating_timer_callback, and call it again
     // 500ms later regardless of how long the callback took to execute
-    add_repeating_timer_ms(-500, repeating_timer_callback, NULL, &timer);
+    add_repeating_timer_ms(-500, repeating_timer_callback, (void *)&param, &timer);
     sleep_ms(3000);
     cancelled = cancel_repeating_timer(&timer);
     printf("cancelled... %d\n", cancelled);
