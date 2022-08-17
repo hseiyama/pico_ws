@@ -30,11 +30,12 @@ static uint64_t get_time(void) {
 static volatile bool alarm_fired;
 
 static void alarm_irq(void) {
+    static uint8_t count = 0;
     // Clear the alarm irq
     hw_clear_bits(&timer_hw->intr, 1u << ALARM_NUM);
 
     // Assume alarm 0 has fired
-    printf("Alarm IRQ fired\n");
+    printf("Alarm IRQ fired (%d)\n", count++);
     alarm_fired = true;
 }
 
