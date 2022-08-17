@@ -1,4 +1,5 @@
-#include <stdio.h>
+//#include <stdio.h>
+#include <string.h>
 #include "pico/stdlib.h"
 #include "hardware/uart.h"
 #include "sys_main.h"
@@ -9,6 +10,8 @@
 #define UART0_RX_GP1    (1)
 #define LED_GPIO_7      (7)
 #define BTN_GPIO_2      (2)
+
+#define HEX_CHAR(a)     ((a) < 10 ? (a)+48 : (a)+55)
 
 static struct sys_time sts_timer_1000ms;
 static bool bls_led_value;
@@ -35,10 +38,16 @@ void tgt_timer_1ms() {
 
 void tgt_main() {
     static uint8_t au8s_message[64];
+    static const uint8_t au8s_msg1[] = "sys_timer_check: 1000ms Pass(";
+    static uint8_t au8s_msg2[8];
+    static const uint8_t au8s_msg3[] = ")\r\n";
     bool bla_in_btn_value;
     bool bla_out_led_value;
+    uint8_t u8a_msg_size;
 
     // 入力処理
+    static uint64_t time_diff;      // ■時間計測用
+    uint64_t time1 = time_us_64();  // ■時間計測用
     tgt_read_btn_value(&bla_in_btn_value);
 
     // 1000msタイマーが満了した場合
@@ -46,7 +55,24 @@ void tgt_main() {
         // GPIO(GP7)の出力用の保持値を反転する
         bls_led_value = !bls_led_value;
         // 標準出力に実行進捗を出力
-        snprintf(au8s_message, sizeof(au8s_message), "sys_timer_check: 1000ms Pass(%lld)\r\n", time_us_64());
+        //printf("sys_timer_check: 1000ms Pass(%lld)\n", time_us_64());
+        //snprintf(au8s_message, sizeof(au8s_message), "sys_timer_check: 1000ms Pass(%lld)\r\n", time_us_64());
+        u8a_msg_size = 0;
+        memcpy(au8s_message, au8s_msg1, sizeof(au8s_msg1) - 1);
+        u8a_msg_size += sizeof(au8s_msg1) - 1;
+        uint64_t u64a_time = time_us_64();
+        au8s_msg2[0] = HEX_CHAR((u64a_time & 0xF0000000) >> 28);
+        au8s_msg2[1] = HEX_CHAR((u64a_time & 0x0F000000) >> 24);
+        au8s_msg2[2] = HEX_CHAR((u64a_time & 0x00F00000) >> 20);
+        au8s_msg2[3] = HEX_CHAR((u64a_time & 0x000F0000) >> 16);
+        au8s_msg2[4] = HEX_CHAR((u64a_time & 0x0000F000) >> 12);
+        au8s_msg2[5] = HEX_CHAR((u64a_time & 0x00000F00) >> 8);
+        au8s_msg2[6] = HEX_CHAR((u64a_time & 0x000000F0) >> 4);
+        au8s_msg2[7] = HEX_CHAR((u64a_time & 0x0000000F) >> 0);
+        memcpy(&au8s_message[u8a_msg_size], au8s_msg2, sizeof(au8s_msg2));
+        u8a_msg_size += sizeof(au8s_msg2);
+        memcpy(&au8s_message[u8a_msg_size], au8s_msg3, sizeof(au8s_msg3));
+        u8a_msg_size += sizeof(au8s_msg3);
         uart_puts(UART0_ID, au8s_message);
         // 1000msタイマーの再開
         sys_timer_start(&sts_timer_1000ms);
@@ -61,6 +87,9 @@ void tgt_main() {
 
     // 出力処理
     tgt_write_led_value(bla_out_led_value);
+    uint64_t time2 = time_us_64();  // ■時間計測用
+    time_diff = time2 - time1;      // ■時間計測用
+    return;                         // ■時間計測用
 }
 
 static void tgt_init_port() {
