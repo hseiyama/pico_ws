@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "pico/stdlib.h"
 #include "sys_main.h"
 #include "apl_main.h"
@@ -22,10 +23,12 @@ void apl_main() {
     // 入力処理
     iod_read_btn_value(&bla_in_btn_value);
 
-    // UART受信した場合、受信メッセージをUART送信
+    // UART受信した場合
     if (iod_call_uart_receive(au8s_rx_message)) {
-        snprintf(au8s_tx_message, sizeof(au8s_tx_message), "%s\r\n", au8s_rx_message);
+        // 受信メッセージをUART送信
+        memcpy(au8s_tx_message, au8s_rx_message, sizeof(au8s_tx_message));
         iod_call_uart_transmit(au8s_tx_message);
+        iod_call_uart_transmit("\r\n");
     }
 
     // 1000msタイマーが満了した場合

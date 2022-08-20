@@ -36,10 +36,11 @@ static void iod_init_port() {
 }
 
 static void iod_init_uart() {
+    // UART0の初期設定
     uart_init(UART0_ID, 115200);
     gpio_set_function(UART0_TX_GPIO, GPIO_FUNC_UART);
     gpio_set_function(UART0_RX_GPIO, GPIO_FUNC_UART);
-    // RX_FIFOをクリアする（機能の動作安定まで時間待ち：1us）
+    // UART0のRX_FIFOをクリア（機能の動作安定まで時間待ち：1us）
     sleep_us(1);
     iod_clear_rx_fifo(UART0_ID);
 }
@@ -97,7 +98,8 @@ bool iod_call_uart_receive(uint8_t *pu8a_message) {
     uint8_t u8a_index = 0;
     bool bla_rcode = false;
 
-    while (uart_is_readable(UART0_ID)) {
+    while (uart_is_readable(UART0_ID)
+    && (u8a_index < IOD_UART_BUFF_SIZE - 1)) {
         bla_rcode = true;
         // UART0の受信
         pu8a_message[u8a_index] = uart_getc(UART0_ID);
