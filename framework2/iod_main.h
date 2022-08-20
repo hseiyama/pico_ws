@@ -1,6 +1,6 @@
 #define IOD_BTN_VALUE_INIT (true)
 #define IOD_LED0_VALUE_INIT (true)
-#define IOD_LED1_VALUE_INIT (false)
+#define IOD_LED1_VALUE_INIT (true)
 #define IOD_UART_BUFF_SIZE (32 + 1)
 
 extern void iod_init();

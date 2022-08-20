@@ -88,10 +88,8 @@ void iod_main_1ms() {
 }
 
 void iod_main_in() {
-    bool bla_btn_value_now;
-
     // GPIO(GP2)のフィルタ処理
-    bla_btn_value_now = gpio_get(BTN_GPIO_GP2);
+    bool bla_btn_value_now = gpio_get(BTN_GPIO_GP2);
     iod_port_filter(bla_btn_value_now, &sts_btn_filter, 4);
 }
 
