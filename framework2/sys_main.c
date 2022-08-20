@@ -54,7 +54,7 @@ void main() {
 
     while (true) {
         // 5ms経過毎に条件が成立
-        if (u8s_timer_5ms >= SYS_CYCLE_TIME) {
+        if (u8s_timer_5ms >= SYS_MAIN_CYCLE) {
             u8s_timer_5ms = 0;
             sys_main_5ms();
         }

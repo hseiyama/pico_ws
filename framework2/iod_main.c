@@ -15,12 +15,19 @@ enum iod_port_pull {
     PORT_PULL_DOWN
 };
 
+struct iod_filter {
+    bool bl_value;
+    uint8_t u8_count;
+};
+
+static struct iod_filter sts_btn_filter;
+
 static void iod_init_port();
 static void iod_port_set_in(uint , enum iod_port_pull);
 static void iod_port_set_out(uint , bool);
 static void iod_init_uart();
 static void iod_clear_rx_fifo(uart_inst_t *);
-static void iod_port_filter(bool, bool *, uint8_t *);
+static void iod_port_filter(bool, struct iod_filter *, uint8_t);
 
 void iod_init() {
     // ポートの初期設定
@@ -36,6 +43,10 @@ static void iod_init_port() {
     iod_port_set_out(LED0_GPIO_GP25 , IOD_LED0_VALUE_INIT);
     // GPIO(GP7)の初期設定（ポート出力）
     iod_port_set_out(LED1_GPIO_GP7 , IOD_LED1_VALUE_INIT);
+
+    // GPIO(GP2)のフィルタ初期設定
+    sts_btn_filter.bl_value = IOD_BTN_VALUE_INIT;
+    sts_btn_filter.u8_count = 0;
 }
 
 static void iod_port_set_in(uint u8a_gpio, enum iod_port_pull u8a_pull) {
@@ -77,37 +88,33 @@ void iod_main_1ms() {
 }
 
 void iod_main_in() {
+    bool bla_btn_value_now;
+
+    // GPIO(GP2)のフィルタ処理
+    bla_btn_value_now = gpio_get(BTN_GPIO_GP2);
+    iod_port_filter(bla_btn_value_now, &sts_btn_filter, 4);
+}
+
+static void iod_port_filter(bool bla_value_now, struct iod_filter *psta_filter, uint8_t u8a_flt_count) {
+    // ポート値が変化している場合
+    if (bla_value_now != psta_filter->bl_value) {
+        (psta_filter->u8_count)++;
+        // 4回連続でポート値の変化が継続している場合
+        if (psta_filter->u8_count >= u8a_flt_count) {
+            psta_filter->u8_count = 0;
+            psta_filter->bl_value = bla_value_now;
+        }
+    // ポート値に変化がない場合
+    } else {
+        psta_filter->u8_count = 0;
+    }
 }
 
 void iod_main_out() {
 }
 
 void iod_read_btn_value(bool *pbla_btn_value) {
-    static bool bls_btn_value_filter = IOD_BTN_VALUE_INIT;
-    static uint8_t u8s_count_filter = 0;
-    bool bla_btn_value_now;
-
-    // GPIO(GP2)の入力
-    bla_btn_value_now = gpio_get(BTN_GPIO_GP2);
-    iod_port_filter(bla_btn_value_now, &bls_btn_value_filter, &u8s_count_filter);
-
-    // 戻り値の設定
-    *pbla_btn_value = bls_btn_value_filter;
-}
-
-static void iod_port_filter(bool bla_value_now, bool *pbla_value, uint8_t *pu8s_count) {
-    // ポート値が変化している場合
-    if (bla_value_now != *pbla_value) {
-        (*pu8s_count)++;
-        // 4回連続でポート値の変化が継続している場合
-        if (*pu8s_count >= 4) {
-            *pu8s_count = 0;
-            *pbla_value = bla_value_now;
-        }
-    // ポート値に変化がない場合
-    } else {
-        *pu8s_count = 0;
-    }
+    *pbla_btn_value = sts_btn_filter.bl_value;
 }
 
 void iod_write_led0_value(bool bla_led_value) {

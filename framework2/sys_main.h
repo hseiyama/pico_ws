@@ -1,4 +1,4 @@
-#define SYS_CYCLE_TIME (5)
+#define SYS_MAIN_CYCLE (5)
 
 struct sys_timer {
 	uint64_t u64_time;
