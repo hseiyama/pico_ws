@@ -18,7 +18,8 @@ static struct sys_timer asts_blink_timer[BLINK_STATE_NUM];
 static bool abls_led_value[BLINK_STATE_NUM];
 static enum apl_blink_state u8s_blink_state;
 
-static bool apl_sate_update(uint8_t);
+static bool apl_blink_sate_update(uint8_t);
+static bool apl_pwm_sate_update(uint8_t);
 
 void apl_init() {
     uint8_t u8a_index;
@@ -36,17 +37,20 @@ void apl_main() {
     static uint8_t au8s_tx_message[IOD_UART_BUFF_SIZE];
     bool bla_in_btn_value;
     bool bla_out_led1_value;
+    uint16_t u16a_adc_value;
     uint8_t u8a_index;
 
     // 入力処理
     iod_read_btn_value(&bla_in_btn_value);
+    iod_read_adc_value(&u16a_adc_value);
 
     // UART受信した場合
     if (iod_call_uart_receive(au8s_rx_message)) {
         // 点滅状態を変更
-        bool bla_update = apl_sate_update(au8s_rx_message[0]);
+        bool bla_blink_update = apl_blink_sate_update(au8s_rx_message[0]);
+        bool bla_pwm_update = apl_pwm_sate_update(au8s_rx_message[0]);
         // 受信メッセージをUART送信
-        if (bla_update) {
+        if (bla_blink_update || bla_pwm_update) {
             snprintf(au8s_tx_message, sizeof(au8s_tx_message), "request='%c'\r\n", au8s_rx_message[0]);
         } else {
             snprintf(au8s_tx_message, sizeof(au8s_tx_message), "request error '%c'\r\n", au8s_rx_message[0]);
@@ -64,7 +68,8 @@ void apl_main() {
             sys_call_timer_start(&asts_blink_timer[u8a_index]);
             // 1000ms毎に実行進捗メッセージをUART送信
             if (u8a_index == BLINK_1000MS) {
-                snprintf(au8s_tx_message, sizeof(au8s_tx_message), "1000ms Pass(%lld)\r\n", time_us_64());
+                //snprintf(au8s_tx_message, sizeof(au8s_tx_message), "1000ms Pass(%lld)\r\n", time_us_64());
+                snprintf(au8s_tx_message, sizeof(au8s_tx_message), "adc value = 0x%04x\r\n", u16a_adc_value);
                 iod_call_uart_transmit(au8s_tx_message);
             }
         }
@@ -82,7 +87,7 @@ void apl_main() {
     iod_write_led1_value(bla_out_led1_value);
 }
 
-static bool apl_sate_update(uint8_t u8a_request) {
+static bool apl_blink_sate_update(uint8_t u8a_request) {
     bool bla_rcode = false;
 
     switch (u8a_request) {
@@ -96,6 +101,55 @@ static bool apl_sate_update(uint8_t u8a_request) {
             break;
         case '2':
             u8s_blink_state = BLINK_2000MS;
+            bla_rcode = true;
+            break;
+    }
+
+    return bla_rcode;
+}
+
+static bool apl_pwm_sate_update(uint8_t u8a_request) {
+    bool bla_rcode = false;
+
+    switch (u8a_request) {
+        case 'q':
+            iod_call_pwm1_set_duty(0);
+            bla_rcode = true;
+            break;
+        case 'w':
+            iod_call_pwm1_set_duty(IOD_PWM1_DUTY_MAX * 1 / 4);
+            bla_rcode = true;
+            break;
+        case 'e':
+            iod_call_pwm1_set_duty(IOD_PWM1_DUTY_MAX * 2 / 4);
+            bla_rcode = true;
+            break;
+        case 'r':
+            iod_call_pwm1_set_duty(IOD_PWM1_DUTY_MAX * 3 / 4);
+            bla_rcode = true;
+            break;
+        case 't':
+            iod_call_pwm1_set_duty(IOD_PWM1_DUTY_MAX);
+            bla_rcode = true;
+            break;
+        case 'a':
+            iod_call_pwm2_set_duty(0);
+            bla_rcode = true;
+            break;
+        case 's':
+            iod_call_pwm2_set_duty(IOD_PWM2_DUTY_MAX * 1 / 4);
+            bla_rcode = true;
+            break;
+        case 'd':
+            iod_call_pwm2_set_duty(IOD_PWM2_DUTY_MAX * 2 / 4);
+            bla_rcode = true;
+            break;
+        case 'f':
+            iod_call_pwm2_set_duty(IOD_PWM2_DUTY_MAX * 3 / 4);
+            bla_rcode = true;
+            break;
+        case 'g':
+            iod_call_pwm2_set_duty(IOD_PWM2_DUTY_MAX);
             bla_rcode = true;
             break;
     }

@@ -5,7 +5,11 @@ add_executable(framework2
         )
 
 # pull in common dependencies
-target_link_libraries(framework2 pico_stdlib)
+target_link_libraries(framework2
+        pico_stdlib
+        hardware_adc
+        hardware_pwm
+        )
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(framework2)
