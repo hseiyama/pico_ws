@@ -21,6 +21,7 @@ static enum apl_blink_state u8s_blink_state;
 static bool apl_blink_sate_update(uint8_t);
 static bool apl_pwm_sate_update(uint8_t);
 
+// 外部公開関数
 void apl_init() {
     uint8_t u8a_index;
 
@@ -87,6 +88,7 @@ void apl_main() {
     iod_write_led1_value(bla_out_led1_value);
 }
 
+// 内部関数
 static bool apl_blink_sate_update(uint8_t u8a_request) {
     bool bla_rcode = false;
 

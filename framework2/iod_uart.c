@@ -8,7 +8,7 @@
 
 static void iod_uart_clear_rx_fifo(uart_inst_t *);
 
-// ■■外部公開関数■■
+// 外部公開関数
 void iod_uart_init() {
     // UART0の初期設定
     uart_init(UART0_ID, 115200);
@@ -49,7 +49,7 @@ void iod_call_uart_transmit(uint8_t *pu8a_message) {
     uart_puts(UART0_ID, pu8a_message);
 }
 
-// ■■内部関数■■
+// 内部関数
 static void iod_uart_clear_rx_fifo(uart_inst_t *psta_uart_id) {
     while (uart_is_readable(psta_uart_id)) {
         uart_getc(psta_uart_id);

@@ -19,7 +19,7 @@ static void sys_main_1ms();
 static void sys_main_5ms();
 static bool sys_intr_timer_1ms(struct repeating_timer *);
 
-// ■■外部公開関数■■
+// 外部公開関数
 void main() {
     struct repeating_timer sta_repeat_timer;
 
@@ -88,7 +88,7 @@ bool sys_call_timer_isrun(struct sys_timer *psta_sys_timer) {
     return psta_sys_timer->bl_state;
 }
 
-// ■■内部関数■■
+// 内部関数
 static void sys_init() {
     u64s_timer_sys = 0;
     u8s_timer_5ms = 0;

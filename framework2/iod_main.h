@@ -1,4 +1,4 @@
-#define PWM_5_WRAP          (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
+#define PWM5_WRAP           (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
 #define GPIO_GP0_UART       (0)
 #define GPIO_GP1_UART       (1)
 #define GPIO_GP2_PORT       (2)
@@ -13,8 +13,8 @@
 #define IOD_LED1_VALUE_INIT (true)
 #define IOD_UART_BUFF_SIZE  (32 + 1)
 #define IOD_ADC_VALUE_MAX   (0x0FFF)
-#define IOD_PWM1_DUTY_MAX   PWM_5_WRAP
-#define IOD_PWM2_DUTY_MAX   PWM_5_WRAP
+#define IOD_PWM1_DUTY_MAX   PWM5_WRAP
+#define IOD_PWM2_DUTY_MAX   PWM5_WRAP
 
 // iod_main
 extern void iod_init();

@@ -19,7 +19,7 @@ static struct iod_adc_filter sts_adc0_filter;
 
 static void iod_adc_filter(uint16_t, struct iod_adc_filter *);
 
-// ■■外部公開関数■■
+// 外部公開関数
 void iod_adc_init() {
     // ADC0の初期設定
     adc_init();
@@ -46,7 +46,7 @@ void iod_read_adc_value(uint16_t *pu16a_adc_value) {
     *pu16a_adc_value = sts_adc0_filter.u16_value;
 }
 
-// ■■内部関数■■
+// 内部関数
 static void iod_adc_filter(uint16_t u16a_value_now, struct iod_adc_filter *psta_filter) {
     uint32_t u32a_value_sum = 0;
     uint8_t u8a_index;

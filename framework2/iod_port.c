@@ -24,7 +24,7 @@ static void iod_port_set_in(uint , enum iod_port_pull);
 static void iod_port_set_out(uint , bool);
 static void iod_port_filter(bool, struct iod_port_filter *);
 
-// ■■外部公開関数■■
+// 外部公開関数
 void iod_port_init() {
     // GPIO(GP2)の初期設定（ポート入力：プルアップ）
     iod_port_set_in(BTN_GPIO_GP2, PORT_PULL_UP);
@@ -64,7 +64,7 @@ void iod_write_led1_value(bool bla_led_value) {
     gpio_put(LED1_GPIO_GP7, bla_led_value);
 }
 
-// ■■内部関数■■
+// 内部関数
 static void iod_port_set_in(uint u32a_gpio, enum iod_port_pull u8a_pull) {
     // GPIOの初期設定（ポート入力）
     gpio_init(u32a_gpio);

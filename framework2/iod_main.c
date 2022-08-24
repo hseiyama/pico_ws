@@ -1,7 +1,7 @@
 #include "pico/stdlib.h"
 #include "iod_main.h"
 
-// ■■外部公開関数■■
+// 外部公開関数
 void iod_init() {
     iod_port_init();
     iod_uart_init();
