@@ -23,7 +23,7 @@ enum blink_state {
 enum pwm_group {
     PWM0 = 0,
     PWM1,
-    PWM_NUM
+    PWM_GROUP_NUM
 };
 
 typedef void (* pwm_duty_set)(uint16_t);
@@ -42,7 +42,7 @@ static const uint16_t acu16s_blink_time[BLINK_STATE_NUM] = {
     500, 1000, 2000
 };
 
-static const struct pwm_duty acsts_pwm_duty[PWM_NUM] = {
+static const struct pwm_duty acsts_pwm_duty[PWM_GROUP_NUM] = {
     {iod_call_pwm0_set_duty, IOD_PWM0_DUTY_MAX},
     {iod_call_pwm1_set_duty, IOD_PWM1_DUTY_MAX}
 };
@@ -51,7 +51,7 @@ static enum request_state u8s_request_sate;
 static enum blink_state u8s_blink_state;
 static struct sys_timer asts_blink_timer[BLINK_STATE_NUM];
 static bool abls_blink_value[BLINK_STATE_NUM];
-struct pwm_request asts_pwm_request[PWM_NUM];
+struct pwm_request asts_pwm_request[PWM_GROUP_NUM];
 static uint8_t au8s_rx_message[IOD_UART_BUFF_SIZE];
 static uint8_t au8s_tx_message[IOD_UART_BUFF_SIZE];
 static struct sys_timer sts_monitor_timer;
@@ -128,7 +128,7 @@ static void blink_init() {
 static void pwm_init() {
     uint8_t u8a_index;
 
-    for (u8a_index = 0; u8a_index < PWM_NUM; u8a_index++) {
+    for (u8a_index = 0; u8a_index < PWM_GROUP_NUM; u8a_index++) {
         asts_pwm_request[u8a_index].bl_state = true;
         asts_pwm_request[u8a_index].u16_duty = acsts_pwm_duty[u8a_index].u16_max;
     }
@@ -268,7 +268,7 @@ static void pwm_update(uint16_t u16a_adc_value) {
     uint8_t u8a_index;
 
     // 要求により、PWMのduty値を決定する
-    for (u8a_index = 0; u8a_index < PWM_NUM; u8a_index++) {
+    for (u8a_index = 0; u8a_index < PWM_GROUP_NUM; u8a_index++) {
         if (asts_pwm_request[u8a_index].bl_state){
             u16a_pwm_duty = asts_pwm_request[u8a_index].u16_duty;
         } else {
