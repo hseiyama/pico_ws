@@ -6,8 +6,8 @@
 #define PWM5_B_GPIO_GP11    GPIO_GP11_PWM
 //#define PWM5_WRAP           (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
 //#define PWM5_CLKDIV         (100.0) // 分周比：周期 5[Khz]/100.0=50[hz]->0.02[s]
-#define PWM5_A_DUTY_INIT    IOD_PWM1_DUTY_MAX
-#define PWM5_B_DUTY_INIT    IOD_PWM2_DUTY_MAX
+#define PWM5_A_DUTY_INIT    IOD_PWM0_DUTY_MAX
+#define PWM5_B_DUTY_INIT    IOD_PWM1_DUTY_MAX
 
 // 外部公開関数
 void iod_pwm_init() {
@@ -36,13 +36,13 @@ void iod_pwm_main_in() {
 void iod_pwm_main_out() {
 }
 
-void iod_call_pwm1_set_duty(uint16_t u16a_level) {
+void iod_call_pwm0_set_duty(uint16_t u16a_level) {
     // PWM5(A)のduty設定
     uint u32a_slice_num = pwm_gpio_to_slice_num(PWM5_A_GPIO_GP10);
     pwm_set_chan_level(u32a_slice_num, PWM_CHAN_A, u16a_level);
 }
 
-void iod_call_pwm2_set_duty(uint16_t u16a_level) {
+void iod_call_pwm1_set_duty(uint16_t u16a_level) {
     // PWM5(B)のduty設定
     uint u32a_slice_num = pwm_gpio_to_slice_num(PWM5_B_GPIO_GP11);
     pwm_set_chan_level(u32a_slice_num, PWM_CHAN_B, u16a_level);
