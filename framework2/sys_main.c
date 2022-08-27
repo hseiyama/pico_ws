@@ -19,31 +19,7 @@ static void sys_main_1ms();
 static void sys_main_5ms();
 static bool sys_intr_timer_1ms(struct repeating_timer *);
 
-static void sys_init() {
-    u64s_timer_sys = 0;
-    u8s_timer_5ms = 0;
-    iod_init();
-    apl_init();
-}
-
-static void sys_main_1ms() {
-    iod_main_1ms();
-}
-
-static void sys_main_5ms() {
-    iod_main_in();
-    apl_main();
-    iod_main_out();
-}
-
-static bool sys_intr_timer_1ms(struct repeating_timer *psta_repeat_timer) {
-    u64s_timer_sys++;
-    u8s_timer_5ms++;
-    sys_main_1ms();
-
-    return true;
-}
-
+// 外部公開関数
 void main() {
     struct repeating_timer sta_repeat_timer;
 
@@ -110,4 +86,30 @@ uint64_t sys_call_timer_diff(struct sys_timer *psta_sys_timer, uint64_t u64a_wai
 
 bool sys_call_timer_isrun(struct sys_timer *psta_sys_timer) {
     return psta_sys_timer->bl_state;
+}
+
+// 内部関数
+static void sys_init() {
+    u64s_timer_sys = 0;
+    u8s_timer_5ms = 0;
+    iod_init();
+    apl_init();
+}
+
+static void sys_main_1ms() {
+    iod_main_1ms();
+}
+
+static void sys_main_5ms() {
+    iod_main_in();
+    apl_main();
+    iod_main_out();
+}
+
+static bool sys_intr_timer_1ms(struct repeating_timer *psta_repeat_timer) {
+    u64s_timer_sys++;
+    u8s_timer_5ms++;
+    sys_main_1ms();
+
+    return true;
 }

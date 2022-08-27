@@ -2,10 +2,18 @@ add_executable(framework2
         sys_main.c
         apl_main.c
         iod_main.c
+        iod_port.c
+        iod_uart.c
+        iod_adc.c
+        iod_pwm.c
         )
 
 # pull in common dependencies
-target_link_libraries(framework2 pico_stdlib)
+target_link_libraries(framework2
+        pico_stdlib
+        hardware_adc
+        hardware_pwm
+        )
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(framework2)
