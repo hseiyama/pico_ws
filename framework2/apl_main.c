@@ -10,6 +10,8 @@ enum request_state {
     REQUEST_BLINK,
     REQUEST_PWM0,
     REQUEST_PWM1,
+    REQUEST_BTN1_INTR,
+    REQUEST_BTN2_INTR,
     REQUEST_STATE_NUM
 };
 
@@ -26,7 +28,14 @@ enum pwm_group {
     PWM_GROUP_NUM
 };
 
-typedef void (* pwm_duty_set)(uint16_t);
+enum btn_intr_group {
+    BTN1_INTR = 0,
+    BTN2_INTR,
+    BTN_INTR_GROUP_NUM
+};
+
+typedef void (* fp_pwm_duty_set)(uint16_t);
+typedef void (* fp_btn_intr_enable)(bool);
 
 struct pwm_request {
     uint16_t u16_duty;
@@ -34,7 +43,7 @@ struct pwm_request {
 };
 
 struct pwm_duty {
-    pwm_duty_set fp_set;
+    fp_pwm_duty_set fp_set;
     uint16_t u16_max;
 };
 
@@ -45,6 +54,11 @@ static const uint16_t acu16s_blink_time[BLINK_STATE_NUM] = {
 static const struct pwm_duty acsts_pwm_duty[PWM_GROUP_NUM] = {
     {iod_call_pwm0_set_duty, IOD_PWM0_DUTY_MAX},
     {iod_call_pwm1_set_duty, IOD_PWM1_DUTY_MAX}
+};
+
+static const fp_btn_intr_enable afps_btn_intr[BTN_INTR_GROUP_NUM] = {
+    iod_call_btn1_intr_enabled,
+    iod_call_btn2_intr_enabled
 };
 
 static enum request_state u8s_request_sate;
@@ -64,6 +78,7 @@ static bool request_sate(uint8_t);
 static bool request_sate_none(uint8_t);
 static bool request_sate_blink(uint8_t);
 static bool request_sate_pwm(uint8_t, enum pwm_group);
+static bool request_sate_btn_intr(uint8_t, enum btn_intr_group);
 static bool blink_update(bool);
 static void pwm_update(uint16_t);
 
@@ -79,19 +94,19 @@ void apl_init() {
 }
 
 void apl_main() {
-    bool bla_in_btn_value;
+    bool bla_in_btn0_value;
     uint16_t u16a_in_adc_value;
     bool bla_out_led1_value;
     uint8_t u8a_index;
 
     // 入力処理
-    iod_read_btn_value(&bla_in_btn_value);
+    iod_read_btn0_value(&bla_in_btn0_value);
     iod_read_adc_value(&u16a_in_adc_value);
 
     // UART要求の入力
     request_input();
     // LED点滅関連の更新
-    bla_out_led1_value = blink_update(bla_in_btn_value);
+    bla_out_led1_value = blink_update(bla_in_btn0_value);
     // PWM関連の更新
     pwm_update(u16a_in_adc_value);
 
@@ -107,6 +122,13 @@ void apl_main() {
     // 出力処理
     iod_write_led0_value(abls_blink_value[BLINK_1000MS]);
     iod_write_led1_value(bla_out_led1_value);
+}
+
+void apl_intr_btn1_down() {
+    iod_call_uart_transmit("interrupt btn1\r\n");
+}
+void apl_intr_btn2_down() {
+    iod_call_uart_transmit("interrupt btn2\r\n");
 }
 
 // 内部関数
@@ -152,6 +174,7 @@ static void request_input() {
 static bool request_sate(uint8_t u8a_request) {
     bool bla_rcode = false;
     enum pwm_group u8a_pwm_id; 
+    enum btn_intr_group u8a_btn_intr_id; 
 
     switch (u8s_request_sate) {
         case REQUEST_NONE:
@@ -164,6 +187,11 @@ static bool request_sate(uint8_t u8a_request) {
         case REQUEST_PWM1:
             u8a_pwm_id = (enum pwm_group)(u8s_request_sate - REQUEST_PWM0);
             bla_rcode = request_sate_pwm(u8a_request, u8a_pwm_id);
+            break;
+        case REQUEST_BTN1_INTR:
+        case REQUEST_BTN2_INTR:
+            u8a_btn_intr_id = (enum btn_intr_group)(u8s_request_sate - REQUEST_BTN1_INTR);
+            bla_rcode = request_sate_btn_intr(u8a_request, u8a_btn_intr_id);
             break;
     }
 
@@ -184,6 +212,14 @@ static bool request_sate_none(uint8_t u8a_request) {
             break;
         case 'c':
             u8s_request_sate = REQUEST_PWM1;
+            bla_rcode = true;
+            break;
+        case 'd':
+            u8s_request_sate = REQUEST_BTN1_INTR;
+            bla_rcode = true;
+            break;
+        case 'e':
+            u8s_request_sate = REQUEST_BTN2_INTR;
             bla_rcode = true;
             break;
     }
@@ -238,8 +274,25 @@ static bool request_sate_pwm(uint8_t u8a_request, enum pwm_group u8a_pwm_id) {
     return bla_rcode;
 }
 
+static bool request_sate_btn_intr(uint8_t u8a_request, enum btn_intr_group u8a_btn_intr_id) {
+    bool bla_rcode = false;
+    bool bla_enabled;
+
+    switch (u8a_request) {
+        case '0':
+        case '1':
+            bla_enabled = (bool)(u8a_request - '0');
+            afps_btn_intr[u8a_btn_intr_id](bla_enabled);
+            bla_rcode = true;
+            break;
+    }
+    u8s_request_sate = REQUEST_NONE;
+
+    return bla_rcode;
+}
+
 static bool blink_update(bool bla_btn_value) {
-    bool bla_led1_value;
+    bool bla_led_value;
     uint8_t u8a_index;
 
     // LED出力用の保持値を更新
@@ -255,12 +308,12 @@ static bool blink_update(bool bla_btn_value) {
 
     // ボタンの入力値により、LED1の出力値を決定する
     if (bla_btn_value) {
-        bla_led1_value = abls_blink_value[u8s_blink_state];
+        bla_led_value = abls_blink_value[u8s_blink_state];
     } else {
-        bla_led1_value = !abls_blink_value[u8s_blink_state];
+        bla_led_value = !abls_blink_value[u8s_blink_state];
     }
 
-    return bla_led1_value;
+    return bla_led_value;
 }
 
 static void pwm_update(uint16_t u16a_adc_value) {
