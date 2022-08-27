@@ -12,6 +12,7 @@ enum request_state {
     REQUEST_PWM1,
     REQUEST_BTN1_INTR,
     REQUEST_BTN2_INTR,
+    REQUEST_WDOG,
     REQUEST_STATE_NUM
 };
 
@@ -79,6 +80,7 @@ static bool request_sate_none(uint8_t);
 static bool request_sate_blink(uint8_t);
 static bool request_sate_pwm(uint8_t, enum pwm_group);
 static bool request_sate_btn_intr(uint8_t, enum btn_intr_group);
+static bool request_sate_wdog(uint8_t);
 static bool blink_update(bool);
 static void pwm_update(uint16_t);
 
@@ -91,6 +93,12 @@ void apl_init() {
     memset(au8s_tx_message, 0, sizeof(au8s_tx_message));
     // 監視タイマーの開始
     sys_call_timer_start(&sts_monitor_timer);
+    // 起動要因を確認
+    if (iod_call_wdog_isboot()) {
+        iod_call_uart_transmit("reboot by watchdog\r\n");
+    } else {
+        iod_call_uart_transmit("framework2\r\n");
+    }
 }
 
 void apl_main() {
@@ -122,6 +130,9 @@ void apl_main() {
     // 出力処理
     iod_write_led0_value(abls_blink_value[BLINK_1000MS]);
     iod_write_led1_value(bla_out_led1_value);
+
+    // ウォッチドッグを更新
+    iod_call_wdog_update();
 }
 
 void apl_intr_btn1_down() {
@@ -193,6 +204,9 @@ static bool request_sate(uint8_t u8a_request) {
             u8a_btn_intr_id = (enum btn_intr_group)(u8s_request_sate - REQUEST_BTN1_INTR);
             bla_rcode = request_sate_btn_intr(u8a_request, u8a_btn_intr_id);
             break;
+        case REQUEST_WDOG:
+            bla_rcode = request_sate_wdog(u8a_request);
+            break;
     }
 
     return bla_rcode;
@@ -220,6 +234,10 @@ static bool request_sate_none(uint8_t u8a_request) {
             break;
         case 'e':
             u8s_request_sate = REQUEST_BTN2_INTR;
+            bla_rcode = true;
+            break;
+        case 'z':
+            u8s_request_sate = REQUEST_WDOG;
             bla_rcode = true;
             break;
     }
@@ -283,6 +301,27 @@ static bool request_sate_btn_intr(uint8_t u8a_request, enum btn_intr_group u8a_b
         case '1':
             bla_enabled = (bool)(u8a_request - '0');
             afps_btn_intr[u8a_btn_intr_id](bla_enabled);
+            bla_rcode = true;
+            break;
+    }
+    u8s_request_sate = REQUEST_NONE;
+
+    return bla_rcode;
+}
+
+static bool request_sate_wdog(uint8_t u8a_request) {
+    bool bla_rcode = false;
+
+    switch (u8a_request) {
+        case '0':
+            // 要求をキャンセル
+            bla_rcode = true;
+            break;
+        case '1':
+            // 無限ループでリセットを誘発
+            while (true) {
+                tight_loop_contents();
+            }
             bla_rcode = true;
             break;
     }

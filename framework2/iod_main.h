@@ -54,3 +54,10 @@ extern void iod_pwm_main_in();
 extern void iod_pwm_main_out();
 extern void iod_call_pwm0_set_duty(uint16_t);
 extern void iod_call_pwm1_set_duty(uint16_t);
+// iod_wdog
+extern void iod_wdog_init();
+extern void iod_wdog_main_1ms();
+extern void iod_wdog_main_in();
+extern void iod_wdog_main_out();
+extern void iod_call_wdog_update();
+extern bool iod_call_wdog_isboot();

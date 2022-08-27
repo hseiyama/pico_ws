@@ -6,6 +6,7 @@ add_executable(framework2
         iod_uart.c
         iod_adc.c
         iod_pwm.c
+        iod_wdog.c
         )
 
 # pull in common dependencies

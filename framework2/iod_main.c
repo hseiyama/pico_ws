@@ -7,6 +7,7 @@ void iod_init() {
     iod_uart_init();
     iod_adc_init();
     iod_pwm_init();
+    iod_wdog_init();
 }
 
 void iod_main_1ms() {
@@ -14,6 +15,7 @@ void iod_main_1ms() {
     iod_uart_main_1ms();
     iod_adc_main_1ms();
     iod_pwm_main_1ms();
+    iod_wdog_main_1ms();
 }
 
 void iod_main_in() {
@@ -21,6 +23,7 @@ void iod_main_in() {
     iod_uart_main_in();
     iod_adc_main_in();
     iod_pwm_main_in();
+    iod_wdog_main_in();
 }
 
 void iod_main_out() {
@@ -28,4 +31,5 @@ void iod_main_out() {
     iod_uart_main_out();
     iod_adc_main_out();
     iod_pwm_main_out();
+    iod_wdog_main_out();
 }
