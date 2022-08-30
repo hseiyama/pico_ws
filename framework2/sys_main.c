@@ -6,8 +6,8 @@
 
 #include "pico/stdlib.h"
 #include "sys_main.h"
-#include "apl_main.h"
 #include "iod_main.h"
+#include "apl_main.h"
 
 #define SYS_TIME_MAX (0xFFFFFFFFFFFFFFFF)
 

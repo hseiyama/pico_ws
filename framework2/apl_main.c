@@ -2,8 +2,8 @@
 #include <string.h>
 #include "pico/stdlib.h"
 #include "sys_main.h"
-#include "apl_main.h"
 #include "iod_main.h"
+#include "apl_main.h"
 
 enum request_state {
     REQUEST_NONE = 0,
@@ -137,6 +137,9 @@ void apl_intr_btn1_down() {
 }
 void apl_intr_btn2_down() {
     iod_call_uart_transmit("interrupt btn2\r\n");
+}
+
+void apl_core1_task() {
 }
 
 // 内部関数

@@ -54,6 +54,16 @@ extern void iod_pwm_main_in();
 extern void iod_pwm_main_out();
 extern void iod_call_pwm0_set_duty(uint16_t);
 extern void iod_call_pwm1_set_duty(uint16_t);
+// iod_mcore
+extern void iod_mcore_init();
+extern void iod_mcore_main_1ms();
+extern void iod_mcore_main_in();
+extern void iod_mcore_main_out();
+extern void iod_call_mcore_start();
+extern void iod_call_mcore_stpo();
+extern void iod_call_mcore_fifo_push(uint32_t);
+extern bool iod_call_mcore_fifo_pop(uint32_t *);
+
 // iod_wdog
 extern void iod_wdog_init();
 extern void iod_wdog_main_1ms();
