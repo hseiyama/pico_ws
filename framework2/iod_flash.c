@@ -7,7 +7,7 @@
  *           ② flash_range_program()で、対象ビットを「0」に書き込む
  *             ※②では、一度ビットを「0」にすると、「1」には戻せない
  * 注意１：flash_range_erase()の実行中に、割り込みが起きると例外が発生する
- * 注意２：CORE1でflash_range_erase()を実行すると、意図しない動作が起きる
+ * 注意２：core1でflash_range_erase()を実行すると、意図しない動作が起きる
  * 注意３：flash_range_erase()を中断すると、次回デバッガーの接続が困難になる
  */
 
