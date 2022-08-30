@@ -85,7 +85,7 @@ static bool request_sate_pwm(uint8_t, enum pwm_group);
 static bool request_sate_btn_intr(uint8_t, enum btn_intr_group);
 static bool request_sate_mcore(uint8_t);
 static bool request_sate_wdog(uint8_t);
-static bool blink_update(bool);
+static bool blink_update(bool, uint16_t);
 static void pwm_update(uint16_t);
 
 // 外部公開関数
@@ -119,7 +119,7 @@ void apl_main() {
     // UART要求の入力
     request_input();
     // LED点滅関連の更新
-    bla_out_led1_value = blink_update(bla_in_btn0_value);
+    bla_out_led1_value = blink_update(bla_in_btn0_value, u16a_in_adc_value);
     // PWM関連の更新
     pwm_update(u16a_in_adc_value);
 
@@ -150,10 +150,23 @@ void apl_core1_task_init() {
 }
 
 void apl_core1_task_main() {
-    sleep_ms(1000);
+    static uint16_t u16a_blink_time = 1000;
+    static bool bla_blink_value = true;
+    uint32_t u32a_fifo_data;
+
+    // core0から受信（FIFO）
+    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
+        u16a_blink_time = (uint16_t)u32a_fifo_data;
+    }
+
+    sleep_ms(u16a_blink_time);
+    bla_blink_value = !bla_blink_value;
     snprintf(au8s_tx_message, sizeof(au8s_tx_message), "core1 task(%d)\r\n", u8s_core1_count);
     u8s_core1_count++;
     iod_call_uart_transmit(au8s_tx_message);
+
+    // core1へ送信（FIFO）
+    iod_call_mcore_fifo_push(bla_blink_value);
 }
 
 // 内部関数
@@ -369,10 +382,14 @@ static bool request_sate_wdog(uint8_t u8a_request) {
     return bla_rcode;
 }
 
-static bool blink_update(bool bla_btn_value) {
+static bool blink_update(bool bla_btn_value, uint16_t u16a_adc_value) {
+    static bool bla_blink_value = true;
+    uint32_t u32a_fifo_data;
     bool bla_led_value;
     uint8_t u8a_index;
 
+    // core1へ送信（FIFO）
+    iod_call_mcore_fifo_push(u16a_adc_value);
     // LED出力用の保持値を更新
     for (u8a_index = 0; u8a_index < BLINK_STATE_NUM; u8a_index++) {
         // 点滅タイマーが満了した場合
@@ -384,11 +401,15 @@ static bool blink_update(bool bla_btn_value) {
         }
     }
 
+    // core1から受信（FIFO）
+    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
+        bla_blink_value = (bool)(u32a_fifo_data & 0xFF);
+    }
     // ボタンの入力値により、LED1の出力値を決定する
     if (bla_btn_value) {
         bla_led_value = abls_blink_value[u8s_blink_state];
     } else {
-        bla_led_value = !abls_blink_value[u8s_blink_state];
+        bla_led_value = bla_blink_value;
     }
 
     return bla_led_value;
