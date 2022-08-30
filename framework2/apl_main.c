@@ -130,9 +130,6 @@ void apl_main() {
     // 出力処理
     iod_write_led0_value(abls_blink_value[BLINK_1000MS]);
     iod_write_led1_value(bla_out_led1_value);
-
-    // ウォッチドッグを更新
-    iod_call_wdog_update();
 }
 
 void apl_intr_btn1_down() {

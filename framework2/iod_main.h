@@ -59,5 +59,4 @@ extern void iod_wdog_init();
 extern void iod_wdog_main_1ms();
 extern void iod_wdog_main_in();
 extern void iod_wdog_main_out();
-extern void iod_call_wdog_update();
 extern bool iod_call_wdog_isboot();
