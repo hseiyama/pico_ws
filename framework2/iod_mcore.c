@@ -27,10 +27,15 @@ void iod_call_mcore_stpo() {
     multicore_reset_core1();
 }
 
-void iod_call_mcore_fifo_push(uint32_t u32a_data) {
-    if (multicore_fifo_wready()) {
+bool iod_call_mcore_fifo_push(uint32_t u32a_data) {
+    bool bla_rcode = false;
+
+    bla_rcode = multicore_fifo_wready();
+    if (bla_rcode) {
         multicore_fifo_push_blocking(u32a_data);
     }
+
+    return bla_rcode;
 }
 
 bool iod_call_mcore_fifo_pop(uint32_t *pu32a_data) {
@@ -46,7 +51,8 @@ bool iod_call_mcore_fifo_pop(uint32_t *pu32a_data) {
 
 // 内部関数
 static void iod_mcore_core1_task() {
+    apl_core1_task_init();
     while (true) {
-        apl_core1_task();
+        apl_core1_task_main();
     }
 }

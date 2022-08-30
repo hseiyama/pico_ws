@@ -12,6 +12,7 @@ enum request_state {
     REQUEST_PWM1,
     REQUEST_BTN1_INTR,
     REQUEST_BTN2_INTR,
+    REQUEST_MCORE,
     REQUEST_WDOG,
     REQUEST_STATE_NUM
 };
@@ -70,6 +71,8 @@ struct pwm_request asts_pwm_request[PWM_GROUP_NUM];
 static uint8_t au8s_rx_message[IOD_UART_BUFF_SIZE];
 static uint8_t au8s_tx_message[IOD_UART_BUFF_SIZE];
 static struct sys_timer sts_monitor_timer;
+// core1用
+static uint8_t u8s_core1_count;
 
 static void request_init();
 static void blink_init();
@@ -80,6 +83,7 @@ static bool request_sate_none(uint8_t);
 static bool request_sate_blink(uint8_t);
 static bool request_sate_pwm(uint8_t, enum pwm_group);
 static bool request_sate_btn_intr(uint8_t, enum btn_intr_group);
+static bool request_sate_mcore(uint8_t);
 static bool request_sate_wdog(uint8_t);
 static bool blink_update(bool);
 static void pwm_update(uint16_t);
@@ -99,6 +103,7 @@ void apl_init() {
     } else {
         iod_call_uart_transmit("framework2\r\n");
     }
+    iod_call_mcore_start();
 }
 
 void apl_main() {
@@ -139,7 +144,16 @@ void apl_intr_btn2_down() {
     iod_call_uart_transmit("interrupt btn2\r\n");
 }
 
-void apl_core1_task() {
+// core1用
+void apl_core1_task_init() {
+    u8s_core1_count = 0;
+}
+
+void apl_core1_task_main() {
+    sleep_ms(1000);
+    snprintf(au8s_tx_message, sizeof(au8s_tx_message), "core1 task(%d)\r\n", u8s_core1_count);
+    u8s_core1_count++;
+    iod_call_uart_transmit(au8s_tx_message);
 }
 
 // 内部関数
@@ -204,6 +218,9 @@ static bool request_sate(uint8_t u8a_request) {
             u8a_btn_intr_id = (enum btn_intr_group)(u8s_request_sate - REQUEST_BTN1_INTR);
             bla_rcode = request_sate_btn_intr(u8a_request, u8a_btn_intr_id);
             break;
+        case REQUEST_MCORE:
+            bla_rcode = request_sate_mcore(u8a_request);
+            break;
         case REQUEST_WDOG:
             bla_rcode = request_sate_wdog(u8a_request);
             break;
@@ -234,6 +251,10 @@ static bool request_sate_none(uint8_t u8a_request) {
             break;
         case 'e':
             u8s_request_sate = REQUEST_BTN2_INTR;
+            bla_rcode = true;
+            break;
+        case 'x':
+            u8s_request_sate = REQUEST_MCORE;
             bla_rcode = true;
             break;
         case 'z':
@@ -301,6 +322,24 @@ static bool request_sate_btn_intr(uint8_t u8a_request, enum btn_intr_group u8a_b
         case '1':
             bla_enabled = (bool)(u8a_request - '0');
             afps_btn_intr[u8a_btn_intr_id](bla_enabled);
+            bla_rcode = true;
+            break;
+    }
+    u8s_request_sate = REQUEST_NONE;
+
+    return bla_rcode;
+}
+
+static bool request_sate_mcore(uint8_t u8a_request) {
+    bool bla_rcode = false;
+
+    switch (u8a_request) {
+        case '0':
+            iod_call_mcore_stpo();
+            bla_rcode = true;
+            break;
+        case '1':
+            iod_call_mcore_start();
             bla_rcode = true;
             break;
     }

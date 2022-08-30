@@ -61,7 +61,7 @@ extern void iod_mcore_main_in();
 extern void iod_mcore_main_out();
 extern void iod_call_mcore_start();
 extern void iod_call_mcore_stpo();
-extern void iod_call_mcore_fifo_push(uint32_t);
+extern bool iod_call_mcore_fifo_push(uint32_t);
 extern bool iod_call_mcore_fifo_pop(uint32_t *);
 
 // iod_wdog
