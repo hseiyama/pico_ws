@@ -1,5 +1,6 @@
 // IOD内部用
 #define PWM5_WRAP           (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
+#define FLASH_HEADER_SIZE   sizeof(uint32_t) // FLASH_PAGE_SIZE のうちヘッダー部のサイズ
 #define GPIO_GP0_UART       (0)
 #define GPIO_GP1_UART       (1)
 #define GPIO_GP2_PORT       (2)
@@ -18,6 +19,7 @@
 #define IOD_ADC_VALUE_MAX   (0x0FFF)
 #define IOD_PWM0_DUTY_MAX   PWM5_WRAP
 #define IOD_PWM1_DUTY_MAX   PWM5_WRAP
+#define IOD_FLASH_DATA_SIZE ((1u << 8) - FLASH_HEADER_SIZE) // FLASH_PAGE_SIZE に依存
 
 // iod_main
 extern void iod_init();
@@ -54,10 +56,17 @@ extern void iod_pwm_main_in();
 extern void iod_pwm_main_out();
 extern void iod_call_pwm0_set_duty(uint16_t);
 extern void iod_call_pwm1_set_duty(uint16_t);
+// iod_flash
+extern void iod_flash_init();
+extern void iod_flash_main_1ms();
+extern void iod_flash_main_in();
+extern void iod_flash_main_out();
+extern bool iod_call_flash_read(uint8_t *, uint16_t);
+extern bool iod_call_flash_write(uint8_t *, uint16_t);
+extern void iod_call_flash_erase();
 // iod_wdog
 extern void iod_wdog_init();
 extern void iod_wdog_main_1ms();
 extern void iod_wdog_main_in();
 extern void iod_wdog_main_out();
-extern void iod_call_wdog_update();
 extern bool iod_call_wdog_isboot();
