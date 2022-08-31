@@ -154,8 +154,9 @@ void apl_core1_task_main() {
     static bool bla_blink_value = true;
     uint32_t u32a_fifo_data;
 
-    // core0から受信（FIFO）
-    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
+    // core0から受信（FIFO / QUEUE）
+//    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
+    while (iod_call_mcore_queue_remove_core1(&u32a_fifo_data)) {
         u16a_blink_time = (uint16_t)u32a_fifo_data;
     }
 
@@ -165,8 +166,9 @@ void apl_core1_task_main() {
     u8s_core1_count++;
     iod_call_uart_transmit(au8s_tx_message);
 
-    // core1へ送信（FIFO）
-    iod_call_mcore_fifo_push(bla_blink_value);
+    // core1へ送信（FIFO / QUEUE）
+//    iod_call_mcore_fifo_push(bla_blink_value);
+    iod_call_mcore_queue_add_core0(bla_blink_value);
 }
 
 // 内部関数
@@ -388,8 +390,9 @@ static bool blink_update(bool bla_btn_value, uint16_t u16a_adc_value) {
     bool bla_led_value;
     uint8_t u8a_index;
 
-    // core1へ送信（FIFO）
-    iod_call_mcore_fifo_push(u16a_adc_value);
+    // core1へ送信（FIFO / QUEUE）
+//    iod_call_mcore_fifo_push(u16a_adc_value);
+    iod_call_mcore_queue_add_core1(u16a_adc_value);
     // LED出力用の保持値を更新
     for (u8a_index = 0; u8a_index < BLINK_STATE_NUM; u8a_index++) {
         // 点滅タイマーが満了した場合
@@ -401,8 +404,9 @@ static bool blink_update(bool bla_btn_value, uint16_t u16a_adc_value) {
         }
     }
 
-    // core1から受信（FIFO）
-    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
+    // core1から受信（FIFO / QUEUE）
+//    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
+    while (iod_call_mcore_queue_remove_core0(&u32a_fifo_data)) {
         bla_blink_value = (bool)(u32a_fifo_data & 0xFF);
     }
     // ボタンの入力値により、LED1の出力値を決定する
