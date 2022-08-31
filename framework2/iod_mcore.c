@@ -5,10 +5,14 @@
 #include "apl_main.h"
 
 // キュー用
-queue_t sts_queue_core0;
-queue_t sts_queue_core1;
+static queue_t sts_queue_core0;
+static queue_t sts_queue_core1;
 // クリティカルセクション用
-critical_section_t sts_critical_section;
+static critical_section_t sts_critical_section;
+// ミューテックス用
+static mutex_t sts_mutex;
+// セマフォ用
+static semaphore_t sts_semaphore;
 
 static void iod_mcore_core1_task();
 
@@ -19,6 +23,10 @@ void iod_mcore_init() {
     queue_init(&sts_queue_core1, sizeof(uint32_t), 2);
     // クリティカルセクションの初期化
     critical_section_init(&sts_critical_section);
+    // ミューテックスの初期化
+    mutex_init(&sts_mutex);
+    // セマフォの初期化
+    sem_init(&sts_semaphore, 1, 1);
 }
 
 void iod_mcore_main_1ms() {
@@ -83,6 +91,22 @@ void iod_call_mcore_lock_enter() {
 
 void iod_call_mcore_lock_exit() {
     critical_section_exit(&sts_critical_section);
+}
+
+void iod_call_mcore_mutex_enter() {
+    mutex_enter_blocking(&sts_mutex);
+}
+
+void iod_call_mcore_mutex_exit() {
+    mutex_exit(&sts_mutex);
+}
+
+void iod_call_mcore_sem_acquire() {
+    sem_acquire_blocking(&sts_semaphore);
+}
+
+void iod_call_mcore_sem_release() {
+    sem_release(&sts_semaphore);
 }
 
 // 内部関数
