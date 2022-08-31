@@ -4,15 +4,21 @@
 #include "iod_main.h"
 #include "apl_main.h"
 
+// キュー用
 queue_t sts_queue_core0;
 queue_t sts_queue_core1;
+// クリティカルセクション用
+critical_section_t sts_critical_section;
 
 static void iod_mcore_core1_task();
 
 // 外部公開関数
 void iod_mcore_init() {
+    // キューの初期化
     queue_init(&sts_queue_core0, sizeof(uint32_t), 2);
     queue_init(&sts_queue_core1, sizeof(uint32_t), 2);
+    // クリティカルセクションの初期化
+    critical_section_init(&sts_critical_section);
 }
 
 void iod_mcore_main_1ms() {
@@ -69,6 +75,14 @@ bool iod_call_mcore_queue_add_core1(uint32_t u32a_data) {
 bool iod_call_mcore_queue_remove_core1(uint32_t *pu32a_data) {
     bool bla_rcode = queue_try_remove(&sts_queue_core1, pu32a_data);
     return bla_rcode;
+}
+
+void iod_call_mcore_lock_enter() {
+    critical_section_enter_blocking(&sts_critical_section);
+}
+
+void iod_call_mcore_lock_exit() {
+    critical_section_exit(&sts_critical_section);
 }
 
 // 内部関数

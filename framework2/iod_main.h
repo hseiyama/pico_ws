@@ -67,6 +67,8 @@ extern bool iod_call_mcore_queue_add_core0(uint32_t);
 extern bool iod_call_mcore_queue_remove_core0(uint32_t *);
 extern bool iod_call_mcore_queue_add_core1(uint32_t);
 extern bool iod_call_mcore_queue_remove_core1(uint32_t *);
+extern void iod_call_mcore_lock_enter();
+extern void iod_call_mcore_lock_exit();
 
 // iod_wdog
 extern void iod_wdog_init();
