@@ -34,16 +34,20 @@ int main() {
     // todo get free sm
     PIO pio = pio0;
     int sm = 0;
+    int sm2 = 1;    // 2個目のステートマシンを追加
     uint offset = pio_add_program(pio, &pwm_program);
     printf("Loaded program at %d\n", offset);
 
-    pwm_program_init(pio, sm, offset, PICO_DEFAULT_LED_PIN);
+    pwm_program_init(pio, sm, offset, 10);          // 1個目のポートを指定
     pio_pwm_set_period(pio, sm, (1u << 16) - 1);
+    pwm_program_init(pio, sm2, offset, 11);         // 2個目のポートを指定
+    pio_pwm_set_period(pio, sm2, (1u << 16) - 1);   // 2個目のステートマシンに指示
 
     int level = 0;
     while (true) {
         printf("Level = %d\n", level);
         pio_pwm_set_level(pio, sm, level * level);
+        pio_pwm_set_level(pio, sm2, level * level); // 2個目のステートマシンに指示
         level = (level + 1) % 256;
         sleep_ms(10);
     }
