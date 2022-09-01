@@ -5,6 +5,7 @@
  */
 
 #include "pico/stdlib.h"
+#include "hardware/sync.h"
 #include "sys_main.h"
 #include "iod_main.h"
 #include "apl_main.h"
@@ -13,6 +14,7 @@
 
 static volatile uint64_t u64s_timer_sys;
 static volatile uint8_t u8s_timer_5ms;
+static uint32_t u32s_interrupts_status;
 
 static void sys_init();
 static void sys_main_1ms();
@@ -88,10 +90,18 @@ bool sys_call_timer_isrun(struct sys_timer *psta_sys_timer) {
     return psta_sys_timer->bl_state;
 }
 
+void sys_call_disable_interrupts() {
+    u32s_interrupts_status = save_and_disable_interrupts();
+}
+void sys_call_enable_interrupts() {
+    restore_interrupts(u32s_interrupts_status);
+}
+
 // 内部関数
 static void sys_init() {
     u64s_timer_sys = 0;
     u8s_timer_5ms = 0;
+    u32s_interrupts_status = 0;
     iod_init();
     apl_init();
 }
