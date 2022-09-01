@@ -72,7 +72,7 @@ extern void iod_call_mcore_lock_exit();
 extern void iod_call_mcore_mutex_enter();
 extern void iod_call_mcore_mutex_exit();
 extern void iod_call_mcore_sem_acquire();
-extern void iod_call_mcore_sem_release();
+extern bool iod_call_mcore_sem_release();
 
 // iod_wdog
 extern void iod_wdog_init();

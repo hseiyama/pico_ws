@@ -105,8 +105,9 @@ void iod_call_mcore_sem_acquire() {
     sem_acquire_blocking(&sts_semaphore);
 }
 
-void iod_call_mcore_sem_release() {
-    sem_release(&sts_semaphore);
+bool iod_call_mcore_sem_release() {
+    bool bla_rcode = sem_release(&sts_semaphore);
+    return bla_rcode;
 }
 
 // 内部関数
