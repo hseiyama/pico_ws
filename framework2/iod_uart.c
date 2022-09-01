@@ -46,7 +46,9 @@ bool iod_call_uart_receive(uint8_t *pu8a_message) {
 
 void iod_call_uart_transmit(uint8_t *pu8a_message) {
     // UART0の送信
+    iod_call_mcore_lock_enter();    // ロック設定
     uart_puts(UART0_ID, pu8a_message);
+    iod_call_mcore_lock_exit();     // ロック解除
 }
 
 // 内部関数

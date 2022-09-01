@@ -39,12 +39,16 @@ void iod_mcore_main_out() {
 }
 
 void iod_call_mcore_start() {
+    iod_call_mcore_lock_enter();    // ロック設定
     multicore_reset_core1();
     multicore_launch_core1(iod_mcore_core1_task);
+    iod_call_mcore_lock_exit();     // ロック解除
 }
 
 void iod_call_mcore_stpo() {
+    iod_call_mcore_lock_enter();    // ロック設定
     multicore_reset_core1();
+    iod_call_mcore_lock_exit();     // ロック解除
 }
 
 bool iod_call_mcore_fifo_push(uint32_t u32a_data) {
@@ -86,6 +90,7 @@ bool iod_call_mcore_queue_remove_core1(uint32_t *pu32a_data) {
 }
 
 void iod_call_mcore_lock_enter() {
+    // 注意：ロック中に sleep_ms()は使用不可（両者で spin_lockを使用）
     critical_section_enter_blocking(&sts_critical_section);
 }
 
