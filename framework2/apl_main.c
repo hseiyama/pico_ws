@@ -13,7 +13,6 @@ enum request_state {
     REQUEST_BTN1_INTR,
     REQUEST_BTN2_INTR,
     REQUEST_MCORE,
-    REQUEST_WDOG,
     REQUEST_STATE_NUM
 };
 
@@ -84,7 +83,6 @@ static bool request_sate_blink(uint8_t);
 static bool request_sate_pwm(uint8_t, enum pwm_group);
 static bool request_sate_btn_intr(uint8_t, enum btn_intr_group);
 static bool request_sate_mcore(uint8_t);
-static bool request_sate_wdog(uint8_t);
 static bool blink_update(bool, uint16_t);
 static void pwm_update(uint16_t);
 
@@ -104,6 +102,9 @@ void apl_init() {
         iod_call_uart_transmit("framework2\r\n");
     }
     iod_call_mcore_start();
+}
+
+void apl_deinit() {
 }
 
 void apl_main() {
@@ -236,9 +237,6 @@ static bool request_sate(uint8_t u8a_request) {
         case REQUEST_MCORE:
             bla_rcode = request_sate_mcore(u8a_request);
             break;
-        case REQUEST_WDOG:
-            bla_rcode = request_sate_wdog(u8a_request);
-            break;
     }
 
     return bla_rcode;
@@ -268,12 +266,19 @@ static bool request_sate_none(uint8_t u8a_request) {
             u8s_request_sate = REQUEST_BTN2_INTR;
             bla_rcode = true;
             break;
-        case 'x':
-            u8s_request_sate = REQUEST_MCORE;
+        case 's':
+            sys_call_sleep_request();
             bla_rcode = true;
             break;
-        case 'z':
-            u8s_request_sate = REQUEST_WDOG;
+        case 'w':
+            // ウォッチドッグのリセットを誘発
+            while (true) {
+                tight_loop_contents();
+            }
+            bla_rcode = true;
+            break;
+        case 'x':
+            u8s_request_sate = REQUEST_MCORE;
             bla_rcode = true;
             break;
     }
@@ -355,27 +360,6 @@ static bool request_sate_mcore(uint8_t u8a_request) {
             break;
         case '1':
             iod_call_mcore_start();
-            bla_rcode = true;
-            break;
-    }
-    u8s_request_sate = REQUEST_NONE;
-
-    return bla_rcode;
-}
-
-static bool request_sate_wdog(uint8_t u8a_request) {
-    bool bla_rcode = false;
-
-    switch (u8a_request) {
-        case '0':
-            // 要求をキャンセル
-            bla_rcode = true;
-            break;
-        case '1':
-            // 無限ループでリセットを誘発
-            while (true) {
-                tight_loop_contents();
-            }
             bla_rcode = true;
             break;
     }

@@ -30,6 +30,9 @@ void iod_adc_init() {
     memset(&sts_adc0_filter, 0, sizeof(sts_adc0_filter));
 }
 
+void iod_adc_deinit() {
+}
+
 void iod_adc_main_1ms() {
 }
 

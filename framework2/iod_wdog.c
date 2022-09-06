@@ -9,6 +9,9 @@ void iod_wdog_init() {
 //    watchdog_enable(10, true);
 }
 
+void iod_wdog_deinit() {
+}
+
 void iod_wdog_main_1ms() {
 }
 

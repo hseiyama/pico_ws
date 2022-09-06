@@ -29,6 +29,9 @@ void iod_mcore_init() {
     sem_init(&sts_semaphore, 1, 1);
 }
 
+void iod_mcore_deinit() {
+}
+
 void iod_mcore_main_1ms() {
 }
 

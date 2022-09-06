@@ -48,6 +48,9 @@ void iod_port_init() {
     sts_btn0_filter.u8_count = 0;
 }
 
+void iod_port_deinit() {
+}
+
 void iod_port_main_1ms() {
 }
 

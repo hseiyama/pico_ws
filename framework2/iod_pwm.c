@@ -27,6 +27,9 @@ void iod_pwm_init() {
     pwm_set_enabled(u32a_slice_num, true);
 }
 
+void iod_pwm_deinit() {
+}
+
 void iod_pwm_main_1ms() {
 }
 

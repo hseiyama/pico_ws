@@ -19,6 +19,9 @@ void iod_uart_init() {
     iod_uart_clear_rx_fifo(UART0_ID);
 }
 
+void iod_uart_deinit() {
+}
+
 void iod_uart_main_1ms() {
 }
 

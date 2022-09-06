@@ -14,9 +14,11 @@
 
 static volatile uint64_t u64s_timer_sys;
 static volatile uint8_t u8s_timer_5ms;
+static bool bls_sleep_request;
 static uint32_t u32s_interrupts_status;
 
 static void sys_init();
+static void sys_deinit();
 static void sys_main_1ms();
 static void sys_main_5ms();
 static bool sys_intr_timer_1ms(struct repeating_timer *);
@@ -35,6 +37,18 @@ void main() {
         if (u8s_timer_5ms >= SYS_MAIN_CYCLE) {
             u8s_timer_5ms = 0;
             sys_main_5ms();
+        }
+        // スリープモードの移行要求がある場合
+        if (bls_sleep_request) {
+            bls_sleep_request = false;
+            // 1msのタイマー割り込みを解除
+            cancel_repeating_timer(&sta_repeat_timer);
+            sys_deinit();
+            // スリープモードに移行する
+            __wfi();
+            sys_init();
+            // 1msのタイマー割り込みを設定
+            add_repeating_timer_ms(-1, sys_intr_timer_1ms, NULL, &sta_repeat_timer);
         }
     }
 }
@@ -97,13 +111,23 @@ void sys_call_enable_interrupts() {
     restore_interrupts(u32s_interrupts_status);
 }
 
+void sys_call_sleep_request() {
+    bls_sleep_request = true;
+}
+
 // 内部関数
 static void sys_init() {
     u64s_timer_sys = 0;
     u8s_timer_5ms = 0;
+    bls_sleep_request = false;
     u32s_interrupts_status = 0;
     iod_init();
     apl_init();
+}
+
+static void sys_deinit() {
+    apl_deinit();
+    iod_deinit();
 }
 
 static void sys_main_1ms() {
