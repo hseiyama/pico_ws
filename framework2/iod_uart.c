@@ -1,5 +1,6 @@
 #include "pico/stdlib.h"
 #include "hardware/uart.h"
+#include "hardware/resets.h"
 #include "iod_main.h"
 
 #define UART0_ID            uart0
@@ -20,6 +21,12 @@ void iod_uart_init() {
 }
 
 void iod_uart_deinit() {
+    // HWブロックを初期化
+    reset_block(RESETS_RESET_UART0_BITS);
+    unreset_block_wait(RESETS_RESET_UART0_BITS);
+    // GPIO機能を初期化
+    gpio_deinit(UART0_TX_GPIO_GP0);
+    gpio_deinit(UART0_RX_GPIO_GP1);
 }
 
 void iod_uart_main_1ms() {

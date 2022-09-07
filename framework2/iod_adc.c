@@ -1,6 +1,7 @@
 #include <string.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
+#include "hardware/resets.h"
 #include "iod_main.h"
 
 #define IOD_ADC_FLT_NUM     (4)
@@ -31,6 +32,9 @@ void iod_adc_init() {
 }
 
 void iod_adc_deinit() {
+    // HWブロックを初期化
+    reset_block(RESETS_RESET_ADC_BITS);
+    unreset_block_wait(RESETS_RESET_ADC_BITS);
 }
 
 void iod_adc_main_1ms() {
