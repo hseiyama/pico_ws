@@ -20,6 +20,15 @@ void iod_deinit() {
     iod_port_deinit();
 }
 
+void iod_reinit() {
+    iod_port_reinit();
+    iod_uart_reinit();
+    iod_adc_reinit();
+    iod_pwm_reinit();
+    iod_mcore_reinit();
+    iod_wdog_reinit();
+}
+
 void iod_main_1ms() {
     iod_port_main_1ms();
     iod_uart_main_1ms();

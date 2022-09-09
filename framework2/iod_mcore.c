@@ -32,6 +32,9 @@ void iod_mcore_init() {
 void iod_mcore_deinit() {
 }
 
+void iod_mcore_reinit() {
+}
+
 void iod_mcore_main_1ms() {
 }
 

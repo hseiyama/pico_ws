@@ -12,6 +12,9 @@ void iod_wdog_init() {
 void iod_wdog_deinit() {
 }
 
+void iod_wdog_reinit() {
+}
+
 void iod_wdog_main_1ms() {
 }
 

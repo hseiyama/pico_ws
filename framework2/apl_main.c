@@ -105,7 +105,9 @@ void apl_init() {
 }
 
 void apl_deinit() {
-    iod_call_mcore_stpo();
+}
+
+void apl_reinit() {
 }
 
 void apl_main() {

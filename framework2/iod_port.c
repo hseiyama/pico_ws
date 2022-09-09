@@ -49,12 +49,9 @@ void iod_port_init() {
 }
 
 void iod_port_deinit() {
-    // GPIO機能を初期化
-    gpio_deinit(BTN0_GPIO_GP2);
-    gpio_deinit(LED1_GPIO_GP7);
-    gpio_deinit(LED0_GPIO_GP25);
-    gpio_set_irq_enabled(BTN1_GPIO_GP14, GPIO_IRQ_EDGE_FALL, false);
-    gpio_set_irq_enabled(BTN2_GPIO_GP15, GPIO_IRQ_EDGE_FALL, false);
+}
+
+void iod_port_reinit() {
 }
 
 void iod_port_main_1ms() {

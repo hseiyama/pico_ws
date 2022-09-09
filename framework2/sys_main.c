@@ -19,6 +19,7 @@ static uint32_t u32s_interrupts_status;
 
 static void sys_init();
 static void sys_deinit();
+static void sys_reinit();
 static void sys_main_1ms();
 static void sys_main_5ms();
 static bool sys_intr_timer_1ms(struct repeating_timer *);
@@ -46,7 +47,7 @@ void main() {
             sys_deinit();
             // スリープモードに移行する
             __wfi();
-            sys_init();
+            sys_reinit();
             // 1msのタイマー割り込みを設定
             add_repeating_timer_ms(-1, sys_intr_timer_1ms, NULL, &sta_repeat_timer);
         }
@@ -128,6 +129,11 @@ static void sys_init() {
 static void sys_deinit() {
     apl_deinit();
     iod_deinit();
+}
+
+static void sys_reinit() {
+    iod_reinit();
+    apl_reinit();
 }
 
 static void sys_main_1ms() {

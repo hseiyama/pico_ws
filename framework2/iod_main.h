@@ -22,12 +22,14 @@
 // iod_main
 extern void iod_init();
 extern void iod_deinit();
+extern void iod_reinit();
 extern void iod_main_1ms();
 extern void iod_main_in();
 extern void iod_main_out();
 // iod_port
 extern void iod_port_init();
 extern void iod_port_deinit();
+extern void iod_port_reinit();
 extern void iod_port_main_1ms();
 extern void iod_port_main_in();
 extern void iod_port_main_out();
@@ -39,6 +41,7 @@ extern void iod_call_btn2_intr_enabled(bool);
 // iod_uart
 extern void iod_uart_init();
 extern void iod_uart_deinit();
+extern void iod_uart_reinit();
 extern void iod_uart_main_1ms();
 extern void iod_uart_main_in();
 extern void iod_uart_main_out();
@@ -47,6 +50,7 @@ extern void iod_call_uart_transmit(uint8_t *);
 // iod_adc
 extern void iod_adc_init();
 extern void iod_adc_deinit();
+extern void iod_adc_reinit();
 extern void iod_adc_main_1ms();
 extern void iod_adc_main_in();
 extern void iod_adc_main_out();
@@ -54,6 +58,7 @@ extern void iod_read_adc_value(uint16_t *);
 // iod_pwm
 extern void iod_pwm_init();
 extern void iod_pwm_deinit();
+extern void iod_pwm_reinit();
 extern void iod_pwm_main_1ms();
 extern void iod_pwm_main_in();
 extern void iod_pwm_main_out();
@@ -62,6 +67,7 @@ extern void iod_call_pwm1_set_duty(uint16_t);
 // iod_mcore
 extern void iod_mcore_init();
 extern void iod_mcore_deinit();
+extern void iod_mcore_reinit();
 extern void iod_mcore_main_1ms();
 extern void iod_mcore_main_in();
 extern void iod_mcore_main_out();
@@ -83,6 +89,7 @@ extern bool iod_call_mcore_sem_release();
 // iod_wdog
 extern void iod_wdog_init();
 extern void iod_wdog_deinit();
+extern void iod_wdog_reinit();
 extern void iod_wdog_main_1ms();
 extern void iod_wdog_main_in();
 extern void iod_wdog_main_out();
