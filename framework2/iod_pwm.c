@@ -1,5 +1,6 @@
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
+#include "hardware/resets.h"
 #include "iod_main.h"
 
 #define PWM5_A_GPIO_GP10    GPIO_GP10_PWM
@@ -25,6 +26,15 @@ void iod_pwm_init() {
     pwm_set_chan_level(u32a_slice_num, PWM_CHAN_B, PWM5_B_DUTY_INIT);
     // PWM出力の有効/無効を設定
     pwm_set_enabled(u32a_slice_num, true);
+}
+
+void iod_pwm_deinit() {
+    // HWブロックを初期化
+    reset_block(RESETS_RESET_PWM_BITS);
+    unreset_block_wait(RESETS_RESET_PWM_BITS);
+    // GPIO機能を初期化
+    gpio_deinit(PWM5_A_GPIO_GP10);
+    gpio_deinit(PWM5_B_GPIO_GP11);
 }
 
 void iod_pwm_main_1ms() {

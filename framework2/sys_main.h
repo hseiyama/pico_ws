@@ -12,3 +12,4 @@ extern uint64_t sys_call_timer_diff(struct sys_timer *, uint64_t);
 extern bool sys_call_timer_isrun(struct sys_timer *);
 extern void sys_call_disable_interrupts();
 extern void sys_call_enable_interrupts();
+extern void sys_call_sleep_request();

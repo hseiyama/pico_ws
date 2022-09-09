@@ -48,6 +48,15 @@ void iod_port_init() {
     sts_btn0_filter.u8_count = 0;
 }
 
+void iod_port_deinit() {
+    // GPIO機能を初期化
+    gpio_deinit(BTN0_GPIO_GP2);
+    gpio_deinit(LED1_GPIO_GP7);
+    gpio_deinit(LED0_GPIO_GP25);
+    gpio_set_irq_enabled(BTN1_GPIO_GP14, GPIO_IRQ_EDGE_FALL, false);
+    gpio_set_irq_enabled(BTN2_GPIO_GP15, GPIO_IRQ_EDGE_FALL, false);
+}
+
 void iod_port_main_1ms() {
 }
 
@@ -92,6 +101,8 @@ static void iod_port_set_in(uint u32a_gpio, enum iod_port_pull u8a_pull) {
         gpio_pull_up(u32a_gpio);
     } else if (u8a_pull == PORT_PULL_DOWN) {
         gpio_pull_down(u32a_gpio);
+    } else {
+        gpio_disable_pulls(u32a_gpio);
     }
 }
 

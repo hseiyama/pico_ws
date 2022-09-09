@@ -11,6 +11,15 @@ void iod_init() {
     iod_wdog_init();
 }
 
+void iod_deinit() {
+    iod_wdog_deinit();
+    iod_mcore_deinit();
+    iod_pwm_deinit();
+    iod_adc_deinit();
+    iod_uart_deinit();
+    iod_port_deinit();
+}
+
 void iod_main_1ms() {
     iod_port_main_1ms();
     iod_uart_main_1ms();
