@@ -45,7 +45,7 @@ void main() {
             // 1msのタイマー割り込みを解除
             cancel_repeating_timer(&sta_repeat_timer);
             sys_deinit();
-            // スリープモードに移行する
+            // スリープモードに移行する（未解決）
             __wfi();
             sys_reinit();
             // 1msのタイマー割り込みを設定

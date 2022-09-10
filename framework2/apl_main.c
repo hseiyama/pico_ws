@@ -48,6 +48,10 @@ struct pwm_duty {
     uint16_t u16_max;
 };
 
+struct flash_data {
+    uint32_t u32_count;
+};
+
 static const uint16_t acu16s_blink_time[BLINK_STATE_NUM] = {
     500, 1000, 2000
 };
@@ -70,6 +74,7 @@ struct pwm_request asts_pwm_request[PWM_GROUP_NUM];
 static uint8_t au8s_rx_message[IOD_UART_BUFF_SIZE];
 static uint8_t au8s_tx_message[IOD_UART_BUFF_SIZE];
 static struct sys_timer sts_monitor_timer;
+static struct flash_data sts_flash_data;
 // core1用
 static uint8_t u8s_core1_count;
 
@@ -93,6 +98,12 @@ void apl_init() {
     pwm_init();
     memset(au8s_rx_message, 0, sizeof(au8s_rx_message));
     memset(au8s_tx_message, 0, sizeof(au8s_tx_message));
+    memset(&sts_flash_data, 0, sizeof(sts_flash_data));
+    if (iod_call_flash_read((uint8_t *)&sts_flash_data, sizeof(sts_flash_data))) {
+        snprintf(au8s_tx_message, sizeof(au8s_tx_message), "flash data = %d\r\n", sts_flash_data.u32_count);
+        iod_call_uart_transmit(au8s_tx_message);
+        sts_flash_data.u32_count++;
+    }
     // 監視タイマーの開始
     sys_call_timer_start(&sts_monitor_timer);
     // 起動要因を確認
@@ -105,9 +116,19 @@ void apl_init() {
 }
 
 void apl_deinit() {
+    iod_call_mcore_stop();
+    iod_call_flash_write((uint8_t *)&sts_flash_data, sizeof(sts_flash_data));
 }
 
 void apl_reinit() {
+    memset(&sts_flash_data, 0, sizeof(sts_flash_data));
+    if (iod_call_flash_read((uint8_t *)&sts_flash_data, sizeof(sts_flash_data))) {
+        snprintf(au8s_tx_message, sizeof(au8s_tx_message), "flash data = %d\r\n", sts_flash_data.u32_count);
+        iod_call_uart_transmit(au8s_tx_message);
+        sts_flash_data.u32_count++;
+    }
+    iod_call_uart_transmit("wakeup\r\n");
+    iod_call_mcore_start();
 }
 
 void apl_main() {
@@ -358,7 +379,7 @@ static bool request_sate_mcore(uint8_t u8a_request) {
 
     switch (u8a_request) {
         case '0':
-            iod_call_mcore_stpo();
+            iod_call_mcore_stop();
             bla_rcode = true;
             break;
         case '1':

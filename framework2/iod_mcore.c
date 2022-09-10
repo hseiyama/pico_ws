@@ -51,7 +51,7 @@ void iod_call_mcore_start() {
     iod_call_mcore_mutex_exit();    // ロック解除
 }
 
-void iod_call_mcore_stpo() {
+void iod_call_mcore_stop() {
     iod_call_mcore_mutex_enter();   // ロック開始
     multicore_reset_core1();
     iod_call_mcore_mutex_exit();    // ロック解除

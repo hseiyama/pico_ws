@@ -7,6 +7,7 @@ add_executable(framework2
         iod_adc.c
         iod_pwm.c
         iod_mcore.c
+        iod_flash.c
         iod_wdog.c
         )
 
@@ -16,6 +17,7 @@ target_link_libraries(framework2
         hardware_adc
         hardware_pwm
         pico_multicore
+        hardware_flash
         )
 
 # create map/bin/hex file etc.
