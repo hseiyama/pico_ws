@@ -1,6 +1,7 @@
 add_executable(framework2
         sys_main.c
         apl_main.c
+        apl_core1.c
         iod_main.c
         iod_port.c
         iod_uart.c

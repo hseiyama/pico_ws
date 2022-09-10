@@ -75,8 +75,6 @@ static uint8_t au8s_rx_message[IOD_UART_BUFF_SIZE];
 static uint8_t au8s_tx_message[IOD_UART_BUFF_SIZE];
 static struct sys_timer sts_monitor_timer;
 static struct flash_data sts_flash_data;
-// core1用
-static uint8_t u8s_core1_count;
 
 static void request_init();
 static void blink_init();
@@ -167,33 +165,6 @@ void apl_intr_btn1_down() {
 }
 void apl_intr_btn2_down() {
     iod_call_uart_transmit("interrupt btn2\r\n");
-}
-
-// core1用
-void apl_core1_task_init() {
-    u8s_core1_count = 0;
-}
-
-void apl_core1_task_main() {
-    static uint16_t u16a_blink_time = 1000;
-    static bool bla_blink_value = true;
-    uint32_t u32a_fifo_data;
-
-    // core0から受信（FIFO / QUEUE）
-//    while (iod_call_mcore_fifo_pop(&u32a_fifo_data)) {
-    while (iod_call_mcore_queue_remove_core1(&u32a_fifo_data)) {
-        u16a_blink_time = (uint16_t)u32a_fifo_data;
-    }
-
-    sleep_ms(u16a_blink_time);
-    bla_blink_value = !bla_blink_value;
-    snprintf(au8s_tx_message, sizeof(au8s_tx_message), "core1 task(%d)\r\n", u8s_core1_count);
-    u8s_core1_count++;
-    iod_call_uart_transmit(au8s_tx_message);
-
-    // core1へ送信（FIFO / QUEUE）
-//    iod_call_mcore_fifo_push(bla_blink_value);
-    iod_call_mcore_queue_add_core0(bla_blink_value);
 }
 
 // 内部関数
