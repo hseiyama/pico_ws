@@ -1,6 +1,9 @@
 add_executable(framework2
         sys_main.c
         apl_main.c
+        apl_request.c
+        apl_blink.c
+        apl_pwm.c
         apl_core1.c
         iod_main.c
         iod_port.c
