@@ -26,13 +26,41 @@ enum request_event {
     EVENT_NUM
 };
 
+// フラッシュ領域の保存用に型定義を移動
+enum blink_state {
+    BLINK_500MS = 0,
+    BLINK_1000MS,
+    BLINK_2000MS,
+    BLINK_STATE_NUM
+};
+
+enum pwm_group {
+    PWM0 = 0,
+    PWM1,
+    PWM_GROUP_NUM
+};
+
+struct pwm_request {
+    uint16_t u16_duty;
+    bool bl_state;
+};
+
+// フラッシュ領域のデータ
 // 構造体のサイズは最大値（IOD_FLASH_DATA_SIZE）を超えないこと
 struct flash_data {
     uint32_t u32_count;
+    enum blink_state u8_blink_state;
+    struct pwm_request ast_pwm_request[PWM_GROUP_NUM];
+};
+
+// フラッシュ領域の情報
+struct flash_info {
+    bool bl_status;
+    struct flash_data st_data;
 };
 
 extern uint8_t au8g_tx_message[IOD_UART_BUFF_SIZE];
-extern struct flash_data sts_flash_data;
+extern struct flash_info stg_flash_info;
 
 // apl_main
 extern void apl_init();

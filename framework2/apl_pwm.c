@@ -1,19 +1,9 @@
+#include <string.h>
 #include "pico/stdlib.h"
 #include "iod_main.h"
 #include "apl_main.h"
 
-enum pwm_group {
-    PWM0 = 0,
-    PWM1,
-    PWM_GROUP_NUM
-};
-
 typedef void (* fp_pwm_duty_set)(uint16_t);
-
-struct pwm_request {
-    uint16_t u16_duty;
-    bool bl_state;
-};
 
 struct pwm_duty {
     fp_pwm_duty_set fp_set;
@@ -39,9 +29,16 @@ void apl_pwm_init() {
         asts_pwm_request[u8a_index].bl_state = true;
         asts_pwm_request[u8a_index].u16_duty = acsts_pwm_duty[u8a_index].u16_max;
     }
+
+    // フラッシュ領域のデータを復元
+    if (stg_flash_info.bl_status) {
+        memcpy(asts_pwm_request, stg_flash_info.st_data.ast_pwm_request, sizeof(asts_pwm_request));
+    }
 }
 
 void apl_pwm_deinit() {
+    // フラッシュ領域にデータを退避
+    memcpy(stg_flash_info.st_data.ast_pwm_request, asts_pwm_request, sizeof(stg_flash_info.st_data.ast_pwm_request));
 }
 
 void apl_pwm_reinit() {

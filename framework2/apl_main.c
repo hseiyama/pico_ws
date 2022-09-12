@@ -19,7 +19,7 @@ static const fp_btn_intr_enable afps_btn_intr[BTN_INTR_GROUP_NUM] = {
 };
 
 uint8_t au8g_tx_message[IOD_UART_BUFF_SIZE];
-struct flash_data sts_flash_data;
+struct flash_info stg_flash_info;
 
 static struct sys_timer sts_monitor_timer;
 
@@ -37,7 +37,6 @@ static void monitor_main();
 // 外部公開関数
 void apl_init() {
     memset(au8g_tx_message, 0, sizeof(au8g_tx_message));
-    memset(&sts_flash_data, 0, sizeof(sts_flash_data));
     flash_init();
 
     // APLモジュールの外部公開関数をコール
@@ -62,7 +61,6 @@ void apl_deinit() {
 
 void apl_reinit() {
     memset(au8g_tx_message, 0, sizeof(au8g_tx_message));
-    memset(&sts_flash_data, 0, sizeof(sts_flash_data));
     flash_init();
 
     // APLモジュールの外部公開関数をコール
@@ -162,15 +160,18 @@ static void process_main() {
 }
 
 static void flash_init() {
-    if (iod_call_flash_read((uint8_t *)&sts_flash_data, sizeof(sts_flash_data))) {
-        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "flash data = %d\r\n", sts_flash_data.u32_count);
+    memset(&stg_flash_info, 0, sizeof(stg_flash_info));
+
+    stg_flash_info.bl_status = iod_call_flash_read((uint8_t *)&(stg_flash_info.st_data), sizeof(stg_flash_info.st_data));
+    if (stg_flash_info.bl_status) {
+        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "flash data = %d\r\n", stg_flash_info.st_data.u32_count);
         iod_call_uart_transmit(au8g_tx_message);
-        sts_flash_data.u32_count++;
+        stg_flash_info.st_data.u32_count++;
     }
 }
 
 static void flash_deinit() {
-    iod_call_flash_write((uint8_t *)&sts_flash_data, sizeof(sts_flash_data));
+    iod_call_flash_write((uint8_t *)&stg_flash_info.st_data, sizeof(stg_flash_info.st_data));
 }
 
 static void monitor_init() {

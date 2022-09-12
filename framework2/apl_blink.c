@@ -3,13 +3,6 @@
 #include "iod_main.h"
 #include "apl_main.h"
 
-enum blink_state {
-    BLINK_500MS = 0,
-    BLINK_1000MS,
-    BLINK_2000MS,
-    BLINK_STATE_NUM
-};
-
 static const uint16_t acu16s_blink_time[BLINK_STATE_NUM] = {
     500, 1000, 2000
 };
@@ -31,9 +24,16 @@ void apl_blink_init() {
         // 点滅タイマーの開始
         sys_call_timer_start(&asts_blink_timer[u8a_index]);
     }
+
+    // フラッシュ領域のデータを復元
+    if (stg_flash_info.bl_status) {
+        u8s_blink_state = stg_flash_info.st_data.u8_blink_state;
+    }
 }
 
 void apl_blink_deinit() {
+    // フラッシュ領域にデータを退避
+    stg_flash_info.st_data.u8_blink_state = u8s_blink_state;
 }
 
 void apl_blink_reinit() {
