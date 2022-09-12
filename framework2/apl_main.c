@@ -24,6 +24,7 @@ struct flash_data sts_flash_data;
 static struct sys_timer sts_monitor_timer;
 
 static void process_request();
+static void process_request_set(enum btn_intr_group, enum request_event);
 static void process_init();
 static void process_deinit();
 static void process_reinit();
@@ -93,22 +94,18 @@ void apl_intr_btn2_down() {
 // 内部関数
 static void process_request() {
     enum request_event u8a_event;
-    enum btn_intr_group u8a_btn_intr_id;
-    bool bla_enabled;
+    enum request_event u8a_event_base;
 
     apl_read_request_event(&u8a_event);
     switch (u8a_event) {
         case EVENT_BTN1_INTR_DISENABLE:
         case EVENT_BTN1_INTR_ENABLE:
-            u8a_btn_intr_id = BTN1_INTR;
-            bla_enabled = (bool)(u8a_event - EVENT_BTN1_INTR_DISENABLE);
-            afps_btn_intr[u8a_btn_intr_id](bla_enabled);
+            process_request_set(BTN1_INTR, u8a_event);
             break;
         case EVENT_BTN2_INTR_DISENABLE:
         case EVENT_BTN2_INTR_ENABLE:
-            u8a_btn_intr_id = BTN2_INTR;
-            bla_enabled = (bool)(u8a_event - EVENT_BTN2_INTR_DISENABLE);
-            afps_btn_intr[u8a_btn_intr_id](bla_enabled);
+            u8a_event_base = EVENT_BTN1_INTR_DISENABLE + (u8a_event - EVENT_BTN2_INTR_DISENABLE);
+            process_request_set(BTN2_INTR, u8a_event_base);
             break;
         case EVENT_SLEEP:
             sys_call_sleep_request();
@@ -124,6 +121,18 @@ static void process_request() {
             break;
         case EVENT_MCORE_START:
             iod_call_mcore_start();
+            break;
+    }
+}
+
+static void process_request_set(enum btn_intr_group u8a_btn_intr_id, enum request_event u8a_event) {
+    bool bla_enabled;
+
+    switch (u8a_event) {
+        case EVENT_BTN1_INTR_DISENABLE:
+        case EVENT_BTN1_INTR_ENABLE:
+            bla_enabled = (bool)(u8a_event - EVENT_BTN1_INTR_DISENABLE);
+            afps_btn_intr[u8a_btn_intr_id](bla_enabled);
             break;
     }
 }
