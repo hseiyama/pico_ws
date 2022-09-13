@@ -62,43 +62,45 @@ static void pwm_request() {
     enum request_event u8a_event_base;
 
     apl_read_request_event(&u8a_event);
+    // 対象イベントの処理
     switch (u8a_event) {
-        case EVENT_PWM0_LEVEL0:
-        case EVENT_PWM0_LEVEL1:
-        case EVENT_PWM0_LEVEL2:
-        case EVENT_PWM0_LEVEL3:
-        case EVENT_PWM0_LEVEL4:
-        case EVENT_PWM0_ADC_VALUE:
-            pwm_request_set(PWM0, u8a_event);
-            break;
-        case EVENT_PWM1_LEVEL0:
-        case EVENT_PWM1_LEVEL1:
-        case EVENT_PWM1_LEVEL2:
-        case EVENT_PWM1_LEVEL3:
-        case EVENT_PWM1_LEVEL4:
-        case EVENT_PWM1_ADC_VALUE:
-            u8a_event_base = EVENT_PWM0_LEVEL0 + (u8a_event - EVENT_PWM1_LEVEL0);
-            pwm_request_set(PWM1, u8a_event_base);
-            break;
+    case EVENT_PWM0_LEVEL0:
+    case EVENT_PWM0_LEVEL1:
+    case EVENT_PWM0_LEVEL2:
+    case EVENT_PWM0_LEVEL3:
+    case EVENT_PWM0_LEVEL4:
+    case EVENT_PWM0_ADC_VALUE:
+        pwm_request_set(PWM0, u8a_event);
+        break;
+    case EVENT_PWM1_LEVEL0:
+    case EVENT_PWM1_LEVEL1:
+    case EVENT_PWM1_LEVEL2:
+    case EVENT_PWM1_LEVEL3:
+    case EVENT_PWM1_LEVEL4:
+    case EVENT_PWM1_ADC_VALUE:
+        u8a_event_base = EVENT_PWM0_LEVEL0 + (u8a_event - EVENT_PWM1_LEVEL0);
+        pwm_request_set(PWM1, u8a_event_base);
+        break;
     }
 }
 
 static void pwm_request_set(enum pwm_group u8a_pwm_id, enum request_event u8a_event) {
     uint16_t u16a_level;
 
+    // 対象イベントの処理
     switch (u8a_event) {
-        case EVENT_PWM0_LEVEL0:
-        case EVENT_PWM0_LEVEL1:
-        case EVENT_PWM0_LEVEL2:
-        case EVENT_PWM0_LEVEL3:
-        case EVENT_PWM0_LEVEL4:
-            u16a_level = (uint16_t)(u8a_event - EVENT_PWM0_LEVEL0);
-            asts_pwm_request[u8a_pwm_id].u16_duty = acsts_pwm_duty[u8a_pwm_id].u16_max * u16a_level / 4;
-            asts_pwm_request[u8a_pwm_id].bl_state = true;
-            break;
-        case EVENT_PWM0_ADC_VALUE:
-            asts_pwm_request[u8a_pwm_id].bl_state = false;
-            break;
+    case EVENT_PWM0_LEVEL0:
+    case EVENT_PWM0_LEVEL1:
+    case EVENT_PWM0_LEVEL2:
+    case EVENT_PWM0_LEVEL3:
+    case EVENT_PWM0_LEVEL4:
+        u16a_level = (uint16_t)(u8a_event - EVENT_PWM0_LEVEL0);
+        asts_pwm_request[u8a_pwm_id].u16_duty = acsts_pwm_duty[u8a_pwm_id].u16_max * u16a_level / 4;
+        asts_pwm_request[u8a_pwm_id].bl_state = true;
+        break;
+    case EVENT_PWM0_ADC_VALUE:
+        asts_pwm_request[u8a_pwm_id].bl_state = false;
+        break;
     }
 }
 

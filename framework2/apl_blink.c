@@ -63,12 +63,13 @@ static void blink_request() {
     enum request_event u8a_event;
 
     apl_read_request_event(&u8a_event);
+    // 対象イベントの処理
     switch (u8a_event) {
-        case EVENT_BLINK_500MS:
-        case EVENT_BLINK_1000MS:
-        case EVENT_BLINK_2000MS:
-            u8s_blink_state = BLINK_500MS + (u8a_event - EVENT_BLINK_500MS);
-            break;
+    case EVENT_BLINK_500MS:
+    case EVENT_BLINK_1000MS:
+    case EVENT_BLINK_2000MS:
+        u8s_blink_state = BLINK_500MS + (u8a_event - EVENT_BLINK_500MS);
+        break;
     }
 }
 

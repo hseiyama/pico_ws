@@ -95,43 +95,45 @@ static void process_request() {
     enum request_event u8a_event_base;
 
     apl_read_request_event(&u8a_event);
+    // 対象イベントの処理
     switch (u8a_event) {
-        case EVENT_BTN1_INTR_DISENABLE:
-        case EVENT_BTN1_INTR_ENABLE:
-            process_request_set(BTN1_INTR, u8a_event);
-            break;
-        case EVENT_BTN2_INTR_DISENABLE:
-        case EVENT_BTN2_INTR_ENABLE:
-            u8a_event_base = EVENT_BTN1_INTR_DISENABLE + (u8a_event - EVENT_BTN2_INTR_DISENABLE);
-            process_request_set(BTN2_INTR, u8a_event_base);
-            break;
-        case EVENT_SLEEP:
-            sys_call_sleep_request();
-            break;
-        case EVENT_WDOG_RESET:
-            // ウォッチドッグのリセットを誘発
-            while (true) {
-                tight_loop_contents();
-            }
-            break;
-        case EVENT_MCORE_STOP:
-            iod_call_mcore_stop();
-            break;
-        case EVENT_MCORE_START:
-            iod_call_mcore_start();
-            break;
+    case EVENT_BTN1_INTR_DISENABLE:
+    case EVENT_BTN1_INTR_ENABLE:
+        process_request_set(BTN1_INTR, u8a_event);
+        break;
+    case EVENT_BTN2_INTR_DISENABLE:
+    case EVENT_BTN2_INTR_ENABLE:
+        u8a_event_base = EVENT_BTN1_INTR_DISENABLE + (u8a_event - EVENT_BTN2_INTR_DISENABLE);
+        process_request_set(BTN2_INTR, u8a_event_base);
+        break;
+    case EVENT_SLEEP:
+        sys_call_sleep_request();
+        break;
+    case EVENT_WDOG_RESET:
+        // ウォッチドッグのリセットを誘発
+        while (true) {
+            tight_loop_contents();
+        }
+        break;
+    case EVENT_MCORE_STOP:
+        iod_call_mcore_stop();
+        break;
+    case EVENT_MCORE_START:
+        iod_call_mcore_start();
+        break;
     }
 }
 
 static void process_request_set(enum btn_intr_group u8a_btn_intr_id, enum request_event u8a_event) {
     bool bla_enabled;
 
+    // 対象イベントの処理
     switch (u8a_event) {
-        case EVENT_BTN1_INTR_DISENABLE:
-        case EVENT_BTN1_INTR_ENABLE:
-            bla_enabled = (bool)(u8a_event - EVENT_BTN1_INTR_DISENABLE);
-            afps_btn_intr[u8a_btn_intr_id](bla_enabled);
-            break;
+    case EVENT_BTN1_INTR_DISENABLE:
+    case EVENT_BTN1_INTR_ENABLE:
+        bla_enabled = (bool)(u8a_event - EVENT_BTN1_INTR_DISENABLE);
+        afps_btn_intr[u8a_btn_intr_id](bla_enabled);
+        break;
     }
 }
 
