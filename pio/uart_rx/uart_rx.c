@@ -35,7 +35,7 @@ void core1_main() {
 int main() {
     // Console output (also a UART, yes it's confusing)
     setup_default_uart();
-    printf("Starting PIO UART RX example\n");
+    printf("Starting PIO UART RX example\r\n");
 
     // Set up the hard UART we're going to use to print characters
     uart_init(HARD_UART_INST, SERIAL_BAUD);
@@ -49,7 +49,7 @@ int main() {
 
     // Tell core 1 to print some text to uart1 as fast as it can
     multicore_launch_core1(core1_main);
-    const char *text = "Hello, world from PIO! (Plus 2 UARTs and 2 cores, for complex reasons)\n";
+    const char *text = "Hello, world from PIO! (Plus 2 UARTs and 2 cores, for complex reasons)\r\n";
     multicore_fifo_push_blocking((uint32_t) text);
 
     // Echo characters received from PIO to the console

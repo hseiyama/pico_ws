@@ -21,7 +21,7 @@ int main() {
     uart_tx_program_init(pio, sm, offset, PIN_TX, SERIAL_BAUD);
 
     while (true) {
-        uart_tx_program_puts(pio, sm, "Hello, world! (from PIO!)\n");
+        uart_tx_program_puts(pio, sm, "Hello, world! (from PIO!)\r\n");
         sleep_ms(1000);
     }
 }
