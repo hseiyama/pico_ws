@@ -37,8 +37,8 @@ int main()
     // WRITE SB+Opcode=101, Address=7bit, DataIn=8bit
 //    uint8_t au8a_tx_buff[3] = {0b00000010, 0b10000000 | 0x7E, 0x7E};
     // 読み出し操作コマンド（順次読み出し）
-    // READ命令でダミーのゼロ •ビットが出力されるので、
-    // その対策として 1ビット分を前にずらしておく
+    // Microwire通信では、READ命令でダミー「0」ビットが出力される
+    // その対策として、命令を 1ビット前にずらしておく
     // READ SB+Opcode=110, Address=7bit, dummy=1bit
     uint8_t au8a_tx_buff[2] = {0b00000110, 0x7E << 1};
     static uint8_t au8a_rx_buff[8];
