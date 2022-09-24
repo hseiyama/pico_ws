@@ -96,6 +96,15 @@ extern void iod_flash_main_in();
 extern void iod_flash_main_out();
 extern bool iod_call_flash_read(uint8_t *, uint16_t);
 extern bool iod_call_flash_write(uint8_t *, uint16_t);
+// iod_spi
+extern void iod_spi_init();
+extern void iod_spi_deinit();
+extern void iod_spi_reinit();
+extern void iod_spi_main_1ms();
+extern void iod_spi_main_in();
+extern void iod_spi_main_out();
+extern bool iod_call_iod_spi_eep_read(uint8_t *, uint16_t);
+extern bool iod_call_iod_spi_eep_write(uint8_t *, uint16_t);
 // iod_wdog
 extern void iod_wdog_init();
 extern void iod_wdog_deinit();
