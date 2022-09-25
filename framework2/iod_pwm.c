@@ -4,10 +4,15 @@
 
 #define PWM5_A_GPIO_GP10    GPIO_GP10_PWM
 #define PWM5_B_GPIO_GP11    GPIO_GP11_PWM
-//#define PWM5_WRAP           (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
+#define PWM5_WRAP           (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
 //#define PWM5_CLKDIV         (100.0) // 分周比：周期 5[Khz]/100.0=50[hz]->0.02[s]
 #define PWM5_A_DUTY_INIT    IOD_PWM0_DUTY_MAX
 #define PWM5_B_DUTY_INIT    IOD_PWM1_DUTY_MAX
+
+/* 定義の整合チェック */
+#if (PWM5_WRAP != IOD_PWM0_DUTY_MAX) || (PWM5_WRAP != IOD_PWM1_DUTY_MAX)
+#error IOD_PWMx_DUTY_MAX is not match PWM5_WRAP.
+#endif
 
 // 外部公開関数
 void iod_pwm_init() {

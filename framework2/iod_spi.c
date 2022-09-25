@@ -11,11 +11,16 @@
 
 #define EEP_TARGET_SIZE     (128) // 93AA46C-I/P のROMサイズ
 #define EEP_BLOCK_SIZE      (32) // 読み書き用ブロックのサイズ（任意）
-#define EEP_HEADER_SIZE     sizeof(uint32_t) // EEP_BLOCK_SIZE のうちヘッダー部のサイズ
+#define EEP_HEADER_SIZE     (4) // EEP_BLOCK_SIZE のうちヘッダー部のサイズ
 #define EEP_HEADER_VALUE_A  (0xAA55AA55)
 #define EEP_HEADER_VALUE_B  (~EEP_HEADER_VALUE_A)
 #define EEP_BLOCK_NUM       (EEP_TARGET_SIZE / EEP_BLOCK_SIZE)
-#define IOD_SPI_EEP_DATA_SIZE   (EEP_BLOCK_SIZE - EEP_HEADER_SIZE)
+#define SPI_EEP_DATA_SIZE   (EEP_BLOCK_SIZE - EEP_HEADER_SIZE)
+
+/* 定義の整合チェック */
+#if (SPI_EEP_DATA_SIZE != IOD_SPI_EEP_DATA_SIZE)
+#error IOD_SPI_EEP_DATA_SIZE is not match SPI_EEP_DATA_SIZE.
+#endif
 
 // 書き込み許可コマンド
 // EWEN SB+Opcode=10011, dummy=5bit
@@ -42,7 +47,7 @@
 
 struct iod_spi_eep_buffer {
     uint32_t u32_header;
-    uint8_t au8_data[IOD_SPI_EEP_DATA_SIZE];
+    uint8_t au8_data[SPI_EEP_DATA_SIZE];
 };
 
 struct iod_spi_eep_info {
@@ -95,7 +100,7 @@ void iod_spi_main_out() {
 bool iod_call_iod_spi_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
-    if (sts_eep_info.bl_status && (u16a_size <= IOD_SPI_EEP_DATA_SIZE)) {
+    if (sts_eep_info.bl_status && (u16a_size <= SPI_EEP_DATA_SIZE)) {
         memcpy(pu8a_buffer, sts_eep_buffer.au8_data, u16a_size);
         bla_rcode = true;
     }
@@ -105,7 +110,7 @@ bool iod_call_iod_spi_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
 bool iod_call_iod_spi_eep_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
-    if (u16a_size <= IOD_SPI_EEP_DATA_SIZE) {
+    if (u16a_size <= SPI_EEP_DATA_SIZE) {
         sts_eep_info.bl_request = true;
         memcpy(sts_eep_buffer.au8_data, pu8a_buffer, u16a_size);
         bla_rcode = true;

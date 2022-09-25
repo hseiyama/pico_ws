@@ -20,16 +20,22 @@
 #include "iod_main.h"
 
 #define FLASH_TARGET_OFFSET (0x1F0000) // W25Q16JVの最終ブロック(Block31:64KB) 0x1F0000-0x1FFFFF を指定
-//#define FLASH_HEADER_SIZE   sizeof(uint32_t) // FLASH_PAGE_SIZE のうちヘッダー部のサイズ
+#define FLASH_HEADER_SIZE   (4) // FLASH_PAGE_SIZE のうちヘッダー部のサイズ
 #define FLASH_HEADER_VALUE  (0xAA55AA55)
 #define FLASH_HEADER_ERASE  (0xFFFFFFFF)
 #define FLASH_PAGE_NUM      (FLASH_SECTOR_SIZE / FLASH_PAGE_SIZE)
+#define FLASH_DATA_SIZE     (FLASH_PAGE_SIZE - FLASH_HEADER_SIZE)
+
+/* 定義の整合チェック */
+#if (FLASH_DATA_SIZE != IOD_FLASH_DATA_SIZE)
+#error IOD_FLASH_DATA_SIZE is not match FLASH_DATA_SIZE.
+#endif
 
 #define FLASH_BUFFER_ADDR(index) ((struct iod_flash_buffer *)(pcu8s_target_address + (FLASH_PAGE_SIZE * (index))))
 
 struct iod_flash_buffer {
     uint32_t u32_header;
-    uint8_t au8_data[IOD_FLASH_DATA_SIZE];
+    uint8_t au8_data[FLASH_DATA_SIZE];
 };
 
 static const uint8_t *pcu8s_target_address = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);
@@ -73,7 +79,7 @@ void iod_flash_main_out() {
 bool iod_call_flash_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
-    if (bls_flash_status && (u16a_size <= IOD_FLASH_DATA_SIZE)) {
+    if (bls_flash_status && (u16a_size <= FLASH_DATA_SIZE)) {
         memcpy(pu8a_buffer, sts_flash_buffer.au8_data, u16a_size);
         bla_rcode = true;
     }
@@ -83,7 +89,7 @@ bool iod_call_flash_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
 bool iod_call_flash_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
-    if (u16a_size <= IOD_FLASH_DATA_SIZE) {
+    if (u16a_size <= FLASH_DATA_SIZE) {
         bls_write_request = true;
         sts_flash_buffer.u32_header = FLASH_HEADER_VALUE;
         memcpy(sts_flash_buffer.au8_data, pu8a_buffer, u16a_size);

@@ -1,6 +1,4 @@
 // IOD内部用
-#define PWM5_WRAP           (25000) // PWMの分解能：周期 125[Mhz]/25000=5[Khz]->0.2[ms]
-#define FLASH_HEADER_SIZE   sizeof(uint32_t) // FLASH_PAGE_SIZE のうちヘッダー部のサイズ
 #define GPIO_GP0_UART       (0)
 #define GPIO_GP1_UART       (1)
 #define GPIO_GP2_PORT       (2)
@@ -16,14 +14,15 @@
 #define GPIO_GP25_PORT      PICO_DEFAULT_LED_PIN
 #define GPIO_GP26_ADC       (26)
 // 外部公開用
-#define IOD_BTN0_VALUE_INIT (true)
-#define IOD_LED0_VALUE_INIT (true)
-#define IOD_LED1_VALUE_INIT (true)
-#define IOD_UART_BUFF_SIZE  (32 + 1)
-#define IOD_ADC_VALUE_MAX   (0x0FFF)
-#define IOD_PWM0_DUTY_MAX   PWM5_WRAP
-#define IOD_PWM1_DUTY_MAX   PWM5_WRAP
-#define IOD_FLASH_DATA_SIZE ((1u << 8) - FLASH_HEADER_SIZE) // FLASH_PAGE_SIZE に依存
+#define IOD_BTN0_VALUE_INIT     (true)
+#define IOD_LED0_VALUE_INIT     (true)
+#define IOD_LED1_VALUE_INIT     (true)
+#define IOD_UART_BUFF_SIZE      (32 + 1)
+#define IOD_ADC_VALUE_MAX       (0x0FFF)
+#define IOD_PWM0_DUTY_MAX       (25000) // PWM5_WRAP と一致させる
+#define IOD_PWM1_DUTY_MAX       (25000) // PWM5_WRAP と一致させる
+#define IOD_SPI_EEP_DATA_SIZE   (32 - 4) // SPI_EEP_DATA_SIZE と一致させる
+#define IOD_FLASH_DATA_SIZE     ((1u << 8) - 4) // FLASH_DATA_SIZE と一致させる
 
 // iod_main
 extern void iod_init();
