@@ -19,6 +19,7 @@ static const fp_btn_intr_enable afps_btn_intr[BTN_INTR_GROUP_NUM] = {
 };
 
 uint8_t au8g_tx_message[IOD_UART_BUFF_SIZE];
+struct eep_spi_data stg_eep_spi_data;
 struct flash_info stg_flash_info;
 
 static struct sys_timer sts_monitor_timer;
@@ -29,6 +30,8 @@ static void process_init();
 static void process_deinit();
 static void process_reinit();
 static void process_main();
+static void eep_spi_init();
+static void eep_spi_deinit();
 static void flash_init();
 static void flash_deinit();
 static void monitor_init();
@@ -37,6 +40,7 @@ static void monitor_main();
 // 外部公開関数
 void apl_init() {
     memset(au8g_tx_message, 0, sizeof(au8g_tx_message));
+    eep_spi_init();
     flash_init();
 
     // APLモジュールの外部公開関数をコール
@@ -56,11 +60,13 @@ void apl_deinit() {
     apl_blink_deinit();
     apl_request_deinit();
 
+    eep_spi_deinit();
     flash_deinit();
 }
 
 void apl_reinit() {
     memset(au8g_tx_message, 0, sizeof(au8g_tx_message));
+    eep_spi_init();
     flash_init();
 
     // APLモジュールの外部公開関数をコール
@@ -159,6 +165,22 @@ static void process_reinit() {
 static void process_main() {
     // 要求イベントの処理
     process_request();
+}
+
+static void eep_spi_init() {
+    bool bla_rcode;
+
+    memset(&stg_eep_spi_data, 0, sizeof(stg_eep_spi_data));
+    bla_rcode = iod_call_iod_spi_eep_read((uint8_t *)&(stg_eep_spi_data), sizeof(stg_eep_spi_data));
+    if (bla_rcode) {
+        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "eep_spi data = %d\r\n", stg_eep_spi_data.u32_count);
+        iod_call_uart_transmit(au8g_tx_message);
+        stg_eep_spi_data.u32_count++;
+    }
+}
+
+static void eep_spi_deinit() {
+    iod_call_iod_spi_eep_write((uint8_t *)&stg_eep_spi_data, sizeof(stg_eep_spi_data));
 }
 
 static void flash_init() {

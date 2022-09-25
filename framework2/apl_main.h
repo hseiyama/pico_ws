@@ -45,6 +45,12 @@ struct pwm_request {
     bool bl_state;
 };
 
+// EEPROM(SPI)に保存するデータ
+// 構造体のサイズは最大値（IOD_SPI_EEP_DATA_SIZE）を超えないこと
+struct eep_spi_data {
+    uint32_t u32_count;
+};
+
 // フラッシュ領域のデータ
 // 構造体のサイズは最大値（IOD_FLASH_DATA_SIZE）を超えないこと
 struct flash_data {
@@ -60,6 +66,7 @@ struct flash_info {
 };
 
 extern uint8_t au8g_tx_message[IOD_UART_BUFF_SIZE];
+extern struct eep_spi_data stg_eep_spi_data;
 extern struct flash_info stg_flash_info;
 
 // apl_main

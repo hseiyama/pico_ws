@@ -9,6 +9,10 @@
 #define GPIO_GP11_PWM       (11)
 #define GPIO_GP14_PORT      (14)
 #define GPIO_GP15_PORT      (15)
+#define GPIO_GP16_SPI       (16)
+#define GPIO_GP17_SPI       (17)
+#define GPIO_GP18_SPI       (18)
+#define GPIO_GP19_SPI       (19)
 #define GPIO_GP25_PORT      PICO_DEFAULT_LED_PIN
 #define GPIO_GP26_ADC       (26)
 // 外部公開用

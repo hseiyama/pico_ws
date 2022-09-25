@@ -3,11 +3,11 @@
 #include "hardware/spi.h"
 #include "iod_main.h"
 
-#define SPI_PORT spi0
-#define SPI_RX  (16)
-#define SPI_CSN (17)
-#define SPI_SCK (18)
-#define SPI_TX  (19)
+#define SPI0_ID             spi0
+#define SPI0_RX_GPIO_GP16   GPIO_GP16_SPI
+#define SPI0_CSN_GPIO_GP17  GPIO_GP17_SPI
+#define SPI0_SCK_GPIO_GP18  GPIO_GP18_SPI
+#define SPI0_TX_GPIO_GP19   GPIO_GP19_SPI
 
 #define EEP_TARGET_SIZE     (128) // 93AA46C-I/P のROMサイズ
 #define EEP_BLOCK_SIZE      (32) // 読み書き用ブロックのサイズ（任意）
@@ -59,6 +59,7 @@ static uint8_t au8s_tx_buffer[3];
 static void iod_spi_eep_init();
 static void iod_spi_eep_deinit();
 static void iod_spi_eep_reinit();
+static void iod_spi_eep_clear();
 static void iod_spi_eep_check_data();
 static void iod_spi_eep_read_data();
 static void iod_spi_eep_write_data();
@@ -115,23 +116,16 @@ bool iod_call_iod_spi_eep_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
 // 内部関数
 static void iod_spi_eep_init() {
     // SPI0の初期設定（クロックは 2MHz）
-    spi_init(SPI_PORT, 2000*1000);
-    gpio_set_function(SPI_RX, GPIO_FUNC_SPI);
-    gpio_set_function(SPI_CSN, GPIO_FUNC_SIO);
-    gpio_set_function(SPI_SCK, GPIO_FUNC_SPI);
-    gpio_set_function(SPI_TX, GPIO_FUNC_SPI);
+    spi_init(SPI0_ID, 2000*1000);
+    gpio_set_function(SPI0_RX_GPIO_GP16, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_CSN_GPIO_GP17, GPIO_FUNC_SIO);
+    gpio_set_function(SPI0_SCK_GPIO_GP18, GPIO_FUNC_SPI);
+    gpio_set_function(SPI0_TX_GPIO_GP19, GPIO_FUNC_SPI);
     // Microwire通信では、CS端子は HIアクティブ（初期値 LOW）
-    gpio_put(SPI_CSN, false);
-    gpio_set_dir(SPI_CSN, GPIO_OUT);
+    gpio_put(SPI0_CSN_GPIO_GP17, false);
+    gpio_set_dir(SPI0_CSN_GPIO_GP17, GPIO_OUT);
 
-    memset(&sts_eep_buffer, 0, sizeof(sts_eep_buffer));
-    sts_eep_info.bl_status = false;
-    sts_eep_info.bl_request = false;
-    sts_eep_info.u8_index = 0;
-    sts_eep_info.u32_header = EEP_HEADER_VALUE_A;
-
-    iod_spi_eep_check_data();
-    iod_spi_eep_read_data();
+    iod_spi_eep_clear();
 }
 
 static void iod_spi_eep_deinit() {
@@ -142,6 +136,10 @@ static void iod_spi_eep_deinit() {
 }
 
 static void iod_spi_eep_reinit() {
+    iod_spi_eep_clear();
+}
+
+static void iod_spi_eep_clear() {
     memset(&sts_eep_buffer, 0, sizeof(sts_eep_buffer));
     sts_eep_info.bl_status = false;
     sts_eep_info.bl_request = false;
@@ -210,26 +208,26 @@ static void iod_spi_eep_write_data() {
 static void iod_spi_eep_block_read(uint8_t u8a_address, uint8_t *pu8a_buffer, uint8_t u8a_size) {
     au8s_tx_buffer[0] = EEP_OPERATE_READ1;
     au8s_tx_buffer[1] = EEP_OPERATE_READ2 | ((u8a_address & 0x7F) << 1);
-    gpio_put(SPI_CSN, true);
-    spi_write_blocking(SPI_PORT, au8s_tx_buffer, EEP_OPERATE_READ_SIZE);
-    spi_read_blocking(SPI_PORT, 0, pu8a_buffer, u8a_size);
-    gpio_put(SPI_CSN, false);
+    gpio_put(SPI0_CSN_GPIO_GP17, true);
+    spi_write_blocking(SPI0_ID, au8s_tx_buffer, EEP_OPERATE_READ_SIZE);
+    spi_read_blocking(SPI0_ID, 0, pu8a_buffer, u8a_size);
+    gpio_put(SPI0_CSN_GPIO_GP17, false);
 }
 
 static void iod_spi_eep_write_enable() {
     au8s_tx_buffer[0] = EEP_OPERATE_EWEN1;
     au8s_tx_buffer[1] = EEP_OPERATE_EWEN2;
-    gpio_put(SPI_CSN, true);
-    spi_write_blocking(SPI_PORT, au8s_tx_buffer, EEP_OPERATE_EWEN_SIZE);
-    gpio_put(SPI_CSN, false);
+    gpio_put(SPI0_CSN_GPIO_GP17, true);
+    spi_write_blocking(SPI0_ID, au8s_tx_buffer, EEP_OPERATE_EWEN_SIZE);
+    gpio_put(SPI0_CSN_GPIO_GP17, false);
 }
 
 static void iod_spi_eep_write_disable() {
     au8s_tx_buffer[0] = EEP_OPERATE_EWDS1;
     au8s_tx_buffer[1] = EEP_OPERATE_EWDS2;
-    gpio_put(SPI_CSN, true);
-    spi_write_blocking(SPI_PORT, au8s_tx_buffer, EEP_OPERATE_EWDS_SIZE);
-    gpio_put(SPI_CSN, false);
+    gpio_put(SPI0_CSN_GPIO_GP17, true);
+    spi_write_blocking(SPI0_ID, au8s_tx_buffer, EEP_OPERATE_EWDS_SIZE);
+    gpio_put(SPI0_CSN_GPIO_GP17, false);
 }
 
 static bool iod_spi_eep_block_write(uint8_t u8a_address, uint8_t *pu8a_buffer, uint8_t u8a_size) {
@@ -250,18 +248,18 @@ static void iod_spi_eep_write(uint8_t u8a_address, uint8_t u8a_data) {
     au8s_tx_buffer[0] = EEP_OPERATE_WRITE1;
     au8s_tx_buffer[1] = EEP_OPERATE_WRITE2 | (u8a_address & 0x7F);
     au8s_tx_buffer[2] = u8a_data;
-    gpio_put(SPI_CSN, true);
-    spi_write_blocking(SPI_PORT, au8s_tx_buffer, EEP_OPERATE_WRITE_SIZE);
-    gpio_put(SPI_CSN, false);
+    gpio_put(SPI0_CSN_GPIO_GP17, true);
+    spi_write_blocking(SPI0_ID, au8s_tx_buffer, EEP_OPERATE_WRITE_SIZE);
+    gpio_put(SPI0_CSN_GPIO_GP17, false);
 }
 
 static bool iod_spi_eep_isbusy() {
     uint8_t u8a_data;
     bool bla_rcode;
 
-    gpio_put(SPI_CSN, true);
-    spi_read_blocking(SPI_PORT, 0, &u8a_data, 1);
-    gpio_put(SPI_CSN, false);
+    gpio_put(SPI0_CSN_GPIO_GP17, true);
+    spi_read_blocking(SPI0_ID, 0, &u8a_data, 1);
+    gpio_put(SPI0_CSN_GPIO_GP17, false);
     bla_rcode = (u8a_data != 0xFF) ? true : false;
 
     return bla_rcode;
