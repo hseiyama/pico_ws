@@ -11,6 +11,8 @@
 #define GPIO_GP17_SPI       (17)
 #define GPIO_GP18_SPI       (18)
 #define GPIO_GP19_SPI       (19)
+#define GPIO_GP20_I2C       (20)
+#define GPIO_GP21_I2C       (21)
 #define GPIO_GP25_PORT      PICO_DEFAULT_LED_PIN
 #define GPIO_GP26_ADC       (26)
 // 外部公開用
@@ -90,15 +92,15 @@ extern void iod_call_mcore_mutex_enter();
 extern void iod_call_mcore_mutex_exit();
 extern void iod_call_mcore_sem_acquire();
 extern bool iod_call_mcore_sem_release();
-// iod_flash
-extern void iod_flash_init();
-extern void iod_flash_deinit();
-extern void iod_flash_reinit();
-extern void iod_flash_main_1ms();
-extern void iod_flash_main_in();
-extern void iod_flash_main_out();
-extern bool iod_call_flash_read(uint8_t *, uint16_t);
-extern bool iod_call_flash_write(uint8_t *, uint16_t);
+// iod_i2c
+extern void iod_i2c_init();
+extern void iod_i2c_deinit();
+extern void iod_i2c_reinit();
+extern void iod_i2c_main_1ms();
+extern void iod_i2c_main_in();
+extern void iod_i2c_main_out();
+extern bool iod_call_iod_i2c_eep_read(uint8_t *, uint16_t);
+extern bool iod_call_iod_i2c_eep_write(uint8_t *, uint16_t);
 // iod_spi
 extern void iod_spi_init();
 extern void iod_spi_deinit();
@@ -108,6 +110,15 @@ extern void iod_spi_main_in();
 extern void iod_spi_main_out();
 extern bool iod_call_iod_spi_eep_read(uint8_t *, uint16_t);
 extern bool iod_call_iod_spi_eep_write(uint8_t *, uint16_t);
+// iod_flash
+extern void iod_flash_init();
+extern void iod_flash_deinit();
+extern void iod_flash_reinit();
+extern void iod_flash_main_1ms();
+extern void iod_flash_main_in();
+extern void iod_flash_main_out();
+extern bool iod_call_flash_read(uint8_t *, uint16_t);
+extern bool iod_call_flash_write(uint8_t *, uint16_t);
 // iod_wdog
 extern void iod_wdog_init();
 extern void iod_wdog_deinit();

@@ -11,6 +11,7 @@ add_executable(framework2
         iod_adc.c
         iod_pwm.c
         iod_mcore.c
+        iod_i2c.c
         iod_spi.c
         iod_flash.c
         iod_wdog.c
@@ -22,6 +23,7 @@ target_link_libraries(framework2
         hardware_adc
         hardware_pwm
         pico_multicore
+        hardware_i2c
         hardware_spi
         hardware_flash
         )
