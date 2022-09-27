@@ -14,12 +14,12 @@
 #define EEP_HEADER_VALUE_A  (0xAA55AA55)
 #define EEP_HEADER_VALUE_B  (~EEP_HEADER_VALUE_A)
 #define EEP_BLOCK_NUM       (EEP_TARGET_SIZE / EEP_BLOCK_SIZE)
-#define EEP_PAGE_NUM        (EEP_BLOCK_NUM / EEP_PAGE_SIZE)
+#define EEP_PAGE_NUM        (EEP_BLOCK_SIZE / EEP_PAGE_SIZE)
 #define I2C_EEP_DATA_SIZE   (EEP_BLOCK_SIZE - EEP_HEADER_SIZE)
 
 /* 定義の整合チェック */
 #if (I2C_EEP_DATA_SIZE != IOD_I2C_EEP_DATA_SIZE)
-//#error IOD_I2C_EEP_DATA_SIZE is not match I2C_EEP_DATA_SIZE.
+#error IOD_I2C_EEP_DATA_SIZE is not match I2C_EEP_DATA_SIZE.
 #endif
 
 // 24FC64-I/P のアドレス
@@ -77,7 +77,7 @@ void iod_i2c_main_in() {
 void iod_i2c_main_out() {
 }
 
-bool iod_call_iod_i2c_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
+bool iod_call_i2c_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
     if (sts_eep_info.bl_status && (u16a_size <= I2C_EEP_DATA_SIZE)) {
@@ -87,7 +87,7 @@ bool iod_call_iod_i2c_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     return bla_rcode;
 }
 
-bool iod_call_iod_i2c_eep_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
+bool iod_call_i2c_eep_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
     if (u16a_size <= I2C_EEP_DATA_SIZE) {
@@ -108,6 +108,8 @@ static void iod_i2c_eep_init() {
     //gpio_pull_up(I2C0_SCL_GPIO_GP21);
 
     iod_i2c_eep_clear();
+    iod_i2c_eep_check_data();
+    iod_i2c_eep_read_data();
 }
 
 static void iod_i2c_eep_deinit() {
@@ -119,6 +121,8 @@ static void iod_i2c_eep_deinit() {
 
 static void iod_i2c_eep_reinit() {
     iod_i2c_eep_clear();
+    iod_i2c_eep_check_data();
+    iod_i2c_eep_read_data();
 }
 
 static void iod_i2c_eep_clear() {
@@ -127,9 +131,6 @@ static void iod_i2c_eep_clear() {
     sts_eep_info.bl_request = false;
     sts_eep_info.u16_index = 0;
     sts_eep_info.u32_header = EEP_HEADER_VALUE_A;
-
-    iod_i2c_eep_check_data();
-    iod_i2c_eep_read_data();
 }
 
 static void iod_i2c_eep_check_data() {
@@ -139,7 +140,7 @@ static void iod_i2c_eep_check_data() {
 
     for (u16a_index = 0; u16a_index < EEP_BLOCK_NUM; u16a_index++) {
         u16a_address = EEP_BLOCK_SIZE * u16a_index;
-        iod_i2c_eep_block_read(u16a_address, (uint8_t *)&u32a_header, sizeof(u32a_header));
+        iod_i2c_eep_read(u16a_address, (uint8_t *)&u32a_header, sizeof(u32a_header));
         if (u16a_index == 0) {
             // 先頭データのヘッダー部を確認
             if (u32a_header == EEP_HEADER_VALUE_A || u32a_header == EEP_HEADER_VALUE_B) {

@@ -23,6 +23,7 @@
 #define IOD_ADC_VALUE_MAX       (0x0FFF)
 #define IOD_PWM0_DUTY_MAX       (25000) // PWM5_WRAP と一致させる
 #define IOD_PWM1_DUTY_MAX       (25000) // PWM5_WRAP と一致させる
+#define IOD_I2C_EEP_DATA_SIZE   (64 - 4) // I2C_EEP_DATA_SIZE と一致させる
 #define IOD_SPI_EEP_DATA_SIZE   (32 - 4) // SPI_EEP_DATA_SIZE と一致させる
 #define IOD_FLASH_DATA_SIZE     ((1u << 8) - 4) // FLASH_DATA_SIZE と一致させる
 
@@ -99,8 +100,8 @@ extern void iod_i2c_reinit();
 extern void iod_i2c_main_1ms();
 extern void iod_i2c_main_in();
 extern void iod_i2c_main_out();
-extern bool iod_call_iod_i2c_eep_read(uint8_t *, uint16_t);
-extern bool iod_call_iod_i2c_eep_write(uint8_t *, uint16_t);
+extern bool iod_call_i2c_eep_read(uint8_t *, uint16_t);
+extern bool iod_call_i2c_eep_write(uint8_t *, uint16_t);
 // iod_spi
 extern void iod_spi_init();
 extern void iod_spi_deinit();
@@ -108,8 +109,8 @@ extern void iod_spi_reinit();
 extern void iod_spi_main_1ms();
 extern void iod_spi_main_in();
 extern void iod_spi_main_out();
-extern bool iod_call_iod_spi_eep_read(uint8_t *, uint16_t);
-extern bool iod_call_iod_spi_eep_write(uint8_t *, uint16_t);
+extern bool iod_call_spi_eep_read(uint8_t *, uint16_t);
+extern bool iod_call_spi_eep_write(uint8_t *, uint16_t);
 // iod_flash
 extern void iod_flash_init();
 extern void iod_flash_deinit();

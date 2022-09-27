@@ -45,6 +45,12 @@ struct pwm_request {
     bool bl_state;
 };
 
+// EEPROM(I2C)に保存するデータ
+// 構造体のサイズは最大値（IOD_I2C_EEP_DATA_SIZE）を超えないこと
+struct eep_i2c_data {
+    uint32_t u32_count;
+};
+
 // EEPROM(SPI)に保存するデータ
 // 構造体のサイズは最大値（IOD_SPI_EEP_DATA_SIZE）を超えないこと
 struct eep_spi_data {

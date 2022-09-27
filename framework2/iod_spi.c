@@ -97,7 +97,7 @@ void iod_spi_main_in() {
 void iod_spi_main_out() {
 }
 
-bool iod_call_iod_spi_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
+bool iod_call_spi_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
     if (sts_eep_info.bl_status && (u16a_size <= SPI_EEP_DATA_SIZE)) {
@@ -107,7 +107,7 @@ bool iod_call_iod_spi_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     return bla_rcode;
 }
 
-bool iod_call_iod_spi_eep_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
+bool iod_call_spi_eep_write(uint8_t *pu8a_buffer, uint16_t u16a_size) {
     bool bla_rcode = false;
 
     if (u16a_size <= SPI_EEP_DATA_SIZE) {
@@ -131,6 +131,8 @@ static void iod_spi_eep_init() {
     gpio_set_dir(SPI0_CSN_GPIO_GP17, GPIO_OUT);
 
     iod_spi_eep_clear();
+    iod_spi_eep_check_data();
+    iod_spi_eep_read_data();
 }
 
 static void iod_spi_eep_deinit() {
@@ -142,6 +144,8 @@ static void iod_spi_eep_deinit() {
 
 static void iod_spi_eep_reinit() {
     iod_spi_eep_clear();
+    iod_spi_eep_check_data();
+    iod_spi_eep_read_data();
 }
 
 static void iod_spi_eep_clear() {
@@ -150,9 +154,6 @@ static void iod_spi_eep_clear() {
     sts_eep_info.bl_request = false;
     sts_eep_info.u8_index = 0;
     sts_eep_info.u32_header = EEP_HEADER_VALUE_A;
-
-    iod_spi_eep_check_data();
-    iod_spi_eep_read_data();
 }
 
 static void iod_spi_eep_check_data() {
