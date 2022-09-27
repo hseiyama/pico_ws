@@ -14,7 +14,6 @@
 #define EEP_HEADER_VALUE_A  (0xAA55AA55)
 #define EEP_HEADER_VALUE_B  (~EEP_HEADER_VALUE_A)
 #define EEP_BLOCK_NUM       (EEP_TARGET_SIZE / EEP_BLOCK_SIZE)
-#define EEP_PAGE_NUM        (EEP_BLOCK_SIZE / EEP_PAGE_SIZE)
 #define I2C_EEP_DATA_SIZE   (EEP_BLOCK_SIZE - EEP_HEADER_SIZE)
 
 /* 定義の整合チェック */
@@ -189,11 +188,12 @@ static void iod_i2c_eep_write_data() {
 }
 
 static void iod_i2c_eep_block_read(uint16_t u16a_address, uint8_t *pu8a_buffer, uint16_t u16a_size) {
+    const uint16_t u16a_page_num = u16a_size / EEP_PAGE_SIZE;
     uint16_t u16a_address_page;
     uint8_t *pu8a_buffer_page;
     uint16_t u16a_index;
 
-    for (u16a_index = 0; u16a_index < EEP_PAGE_NUM; u16a_index++) {
+    for (u16a_index = 0; u16a_index < u16a_page_num; u16a_index++) {
         u16a_address_page = u16a_address + EEP_PAGE_SIZE * u16a_index;
         pu8a_buffer_page = pu8a_buffer + EEP_PAGE_SIZE * u16a_index;
         iod_i2c_eep_read(u16a_address_page, pu8a_buffer_page, EEP_PAGE_SIZE);
@@ -210,11 +210,12 @@ static void iod_i2c_eep_read(uint16_t u16a_address, uint8_t *pu8a_buffer, uint16
 }
 
 static bool iod_i2c_eep_block_write(uint16_t u16a_address, uint8_t *pu8a_buffer, uint16_t u16a_size) {
+    const uint16_t u16a_page_num = u16a_size / EEP_PAGE_SIZE;
     uint16_t u16a_address_page;
     uint8_t *pu8a_buffer_page;
     uint16_t u16a_index;
 
-    for (u16a_index = 0; u16a_index < EEP_PAGE_NUM; u16a_index++) {
+    for (u16a_index = 0; u16a_index < u16a_page_num; u16a_index++) {
         u16a_address_page = u16a_address + EEP_PAGE_SIZE * u16a_index;
         pu8a_buffer_page = pu8a_buffer + EEP_PAGE_SIZE * u16a_index;
         iod_i2c_eep_write(u16a_address_page, pu8a_buffer_page, EEP_PAGE_SIZE);
