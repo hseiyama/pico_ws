@@ -41,17 +41,17 @@ void apl_blink_reinit() {
 
 void apl_blink_main() {
     bool bla_in_btn0_value;
-    uint16_t u16a_in_adc_value;
+    uint16_t u16a_in_vrest_value;
     bool bla_out_led1_value;
 
     // 入力処理
     iod_read_btn0_value(&bla_in_btn0_value);
-    iod_read_adc_value(&u16a_in_adc_value);
+    iod_read_vrest_value(&u16a_in_vrest_value);
 
     // 要求イベントの処理
     blink_request();
     // LED点滅関連の更新
-    bla_out_led1_value = blink_update(bla_in_btn0_value, u16a_in_adc_value);
+    bla_out_led1_value = blink_update(bla_in_btn0_value, u16a_in_vrest_value);
 
     // 出力処理
     iod_write_led0_value(abls_blink_value[BLINK_1000MS]);

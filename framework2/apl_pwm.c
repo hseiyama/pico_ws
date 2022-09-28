@@ -45,15 +45,15 @@ void apl_pwm_reinit() {
 }
 
 void apl_pwm_main() {
-    uint16_t u16a_in_adc_value;
+    uint16_t u16a_in_vrest_value;
 
     // 入力処理
-    iod_read_adc_value(&u16a_in_adc_value);
+    iod_read_vrest_value(&u16a_in_vrest_value);
 
     // 要求イベントの処理
     pwm_request();
     // PWM関連の更新
-    pwm_update(u16a_in_adc_value);
+    pwm_update(u16a_in_vrest_value);
 }
 
 // 内部関数

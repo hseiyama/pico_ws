@@ -15,7 +15,9 @@
 #define GPIO_GP21_I2C       (21)
 #define GPIO_GP25_PORT      PICO_DEFAULT_LED_PIN
 #define GPIO_GP26_ADC       (26)
-// 外部公開用
+#define GPIO_GP27_ADC       (27)
+#define GPIO_GP28_ADC       (28)
+/// 外部公開用
 #define IOD_BTN0_VALUE_INIT     (true)
 #define IOD_LED0_VALUE_INIT     (true)
 #define IOD_LED1_VALUE_INIT     (true)
@@ -62,7 +64,10 @@ extern void iod_adc_reinit();
 extern void iod_adc_main_1ms();
 extern void iod_adc_main_in();
 extern void iod_adc_main_out();
-extern void iod_read_adc_value(uint16_t *);
+extern void iod_read_vrest_value(uint16_t *);
+extern void iod_read_gyro1_value(uint16_t *);
+extern void iod_read_gyro2_value(uint16_t *);
+
 // iod_pwm
 extern void iod_pwm_init();
 extern void iod_pwm_deinit();

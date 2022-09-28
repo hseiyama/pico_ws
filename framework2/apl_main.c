@@ -177,7 +177,7 @@ static void eep_i2c_init() {
     bool bla_rcode;
 
     memset(&stg_eep_i2c_data, 0, sizeof(stg_eep_i2c_data));
-    bla_rcode = iod_call_i2c_eep_read((uint8_t *)&(stg_eep_i2c_data), sizeof(stg_eep_i2c_data));
+    bla_rcode = iod_call_i2c_eep_read((uint8_t *)&stg_eep_i2c_data, sizeof(stg_eep_i2c_data));
     if (bla_rcode) {
         snprintf(au8g_tx_message, sizeof(au8g_tx_message), "eep_i2c data = %d\r\n", stg_eep_i2c_data.u32_count);
         iod_call_uart_transmit(au8g_tx_message);
@@ -193,7 +193,7 @@ static void eep_spi_init() {
     bool bla_rcode;
 
     memset(&stg_eep_spi_data, 0, sizeof(stg_eep_spi_data));
-    bla_rcode = iod_call_spi_eep_read((uint8_t *)&(stg_eep_spi_data), sizeof(stg_eep_spi_data));
+    bla_rcode = iod_call_spi_eep_read((uint8_t *)&stg_eep_spi_data, sizeof(stg_eep_spi_data));
     if (bla_rcode) {
         snprintf(au8g_tx_message, sizeof(au8g_tx_message), "eep_spi data = %d\r\n", stg_eep_spi_data.u32_count);
         iod_call_uart_transmit(au8g_tx_message);
@@ -208,7 +208,7 @@ static void eep_spi_deinit() {
 static void flash_init() {
     memset(&stg_flash_info, 0, sizeof(stg_flash_info));
 
-    stg_flash_info.bl_status = iod_call_flash_read((uint8_t *)&(stg_flash_info.st_data), sizeof(stg_flash_info.st_data));
+    stg_flash_info.bl_status = iod_call_flash_read((uint8_t *)&stg_flash_info.st_data, sizeof(stg_flash_info.st_data));
     if (stg_flash_info.bl_status) {
         snprintf(au8g_tx_message, sizeof(au8g_tx_message), "flash data = %d\r\n", stg_flash_info.st_data.u32_count);
         iod_call_uart_transmit(au8g_tx_message);
@@ -226,15 +226,22 @@ static void monitor_init() {
 }
 
 static void monitor_main() {
-    uint16_t u16a_in_adc_value;
+    uint16_t u16a_in_vrest_value;
+    uint16_t u16a_in_gyro1_value;
+    uint16_t u16a_in_gyro2_value;
 
     // 入力処理
-    iod_read_adc_value(&u16a_in_adc_value);
+    iod_read_vrest_value(&u16a_in_vrest_value);
+    iod_read_gyro1_value(&u16a_in_gyro1_value);
+    iod_read_gyro2_value(&u16a_in_gyro2_value);
 
     // 監視タイマーが満了した場合
-    if (sys_call_timer_check(&sts_monitor_timer, 2000)) {
+    if (sys_call_timer_check(&sts_monitor_timer, 200)) {
         //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "2000ms Pass(%lld)\r\n", time_us_64());
-        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "adc value = 0x%04x\r\n", u16a_in_adc_value);
+        //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "adc value = 0x%04x\r\n", u16a_in_vrest_value);
+        int16_t s16a_gyro1 = u16a_in_gyro1_value - 0x0750;
+        int16_t s16a_gyro2 = u16a_in_gyro2_value - 0x0750;
+        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro(1, 2) = (%d, %d)\r\n", s16a_gyro1, s16a_gyro2);
         iod_call_uart_transmit(au8g_tx_message);
         // 監視タイマーの再開
         sys_call_timer_start(&sts_monitor_timer);

@@ -230,7 +230,7 @@ static void iod_i2c_eep_write(uint16_t u16a_address, uint8_t *pu8a_buffer, uint1
     // 書き込み操作コマンド（ページ書き込み）
     au8s_tx_buffer[0] = (u16a_address >> 8) & 0xFF;
     au8s_tx_buffer[1] = u16a_address & 0xFF;
-    memcpy(&(au8s_tx_buffer[2]), pu8a_buffer, u16a_size);
+    memcpy(&au8s_tx_buffer[2], pu8a_buffer, u16a_size);
     // 書き込み操作
     i2c_write_blocking(I2C0_ID, EEP_ADDRESS, au8s_tx_buffer, u16a_size + 2, false);
 }
