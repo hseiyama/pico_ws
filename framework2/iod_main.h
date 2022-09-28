@@ -2,11 +2,11 @@
 #define GPIO_GP0_UART       (0)
 #define GPIO_GP1_UART       (1)
 #define GPIO_GP2_PORT       (2)
-#define GPIO_GP7_PORT       (7)
-#define GPIO_GP10_PWM       (10)
-#define GPIO_GP11_PWM       (11)
-#define GPIO_GP14_PORT      (14)
-#define GPIO_GP15_PORT      (15)
+#define GPIO_GP3_PORT       (3)
+#define GPIO_GP6_PWM        (6)
+#define GPIO_GP7_PWM        (7)
+#define GPIO_GP8_PORT       (8)
+#define GPIO_GP9_PORT       (9)
 #define GPIO_GP16_SPI       (16)
 #define GPIO_GP17_SPI       (17)
 #define GPIO_GP18_SPI       (18)
@@ -23,8 +23,8 @@
 #define IOD_LED1_VALUE_INIT     (true)
 #define IOD_UART_BUFF_SIZE      (32 + 1)
 #define IOD_ADC_VALUE_MAX       (0x0FFF)
-#define IOD_PWM0_DUTY_MAX       (25000) // PWM5_WRAP と一致させる
-#define IOD_PWM1_DUTY_MAX       (25000) // PWM5_WRAP と一致させる
+#define IOD_PWM0_DUTY_MAX       (25000) // PWM3_WRAP と一致させる
+#define IOD_PWM1_DUTY_MAX       (25000) // PWM3_WRAP と一致させる
 #define IOD_I2C_EEP_DATA_SIZE   (64 - 4) // I2C_EEP_DATA_SIZE と一致させる
 #define IOD_SPI_EEP_DATA_SIZE   (32 - 4) // SPI_EEP_DATA_SIZE と一致させる
 #define IOD_FLASH_DATA_SIZE     ((1u << 8) - 4) // FLASH_DATA_SIZE と一致させる

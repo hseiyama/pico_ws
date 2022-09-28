@@ -5,10 +5,10 @@
 #define IOD_PORT_FLT_NUM    (4)
 
 #define BTN0_GPIO_GP2       GPIO_GP2_PORT
-#define BTN1_GPIO_GP14      GPIO_GP14_PORT
-#define BTN2_GPIO_GP15      GPIO_GP15_PORT
+#define BTN1_GPIO_GP8       GPIO_GP8_PORT
+#define BTN2_GPIO_GP9       GPIO_GP9_PORT
 #define LED0_GPIO_GP25      GPIO_GP25_PORT
-#define LED1_GPIO_GP7       GPIO_GP7_PORT
+#define LED1_GPIO_GP3       GPIO_GP3_PORT
 
 enum iod_port_pull {
     PORT_PULL_NONE,
@@ -35,13 +35,13 @@ void iod_port_init() {
     // GPIO(GP25)の初期設定（ポート出力）
     iod_port_set_out(LED0_GPIO_GP25, IOD_LED0_VALUE_INIT);
     // GPIO(GP7)の初期設定（ポート出力）
-    iod_port_set_out(LED1_GPIO_GP7, IOD_LED1_VALUE_INIT);
+    iod_port_set_out(LED1_GPIO_GP3, IOD_LED1_VALUE_INIT);
     // GPIO(GP14,15)の割り込み設定
     // 補足：入力ポートのプルアップ設定との併用が可能
     // 注意１：GPIOで異なるコールバック関数を設定しても、有効になるのは最後に指定したもの
     // 注意２：gpio_set_irq_enabled_with_callback()では、最初にtrueを指定する必要あり
-    gpio_set_irq_enabled_with_callback(BTN1_GPIO_GP14, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
-    gpio_set_irq_enabled_with_callback(BTN2_GPIO_GP15, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
+    gpio_set_irq_enabled_with_callback(BTN1_GPIO_GP8, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
+    gpio_set_irq_enabled_with_callback(BTN2_GPIO_GP9, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
 
     // GPIO(GP2)のフィルタ初期設定
     sts_btn0_filter.bl_value = IOD_BTN0_VALUE_INIT;
@@ -77,15 +77,15 @@ void iod_write_led0_value(bool bla_led_value) {
 
 void iod_write_led1_value(bool bla_led_value) {
     // GPIO(GP7)の出力
-    gpio_put(LED1_GPIO_GP7, bla_led_value);
+    gpio_put(LED1_GPIO_GP3, bla_led_value);
 }
 
 void iod_call_btn1_intr_enabled(bool bla_enabled) {
-    gpio_set_irq_enabled(BTN1_GPIO_GP14, GPIO_IRQ_EDGE_FALL, bla_enabled);
+    gpio_set_irq_enabled(BTN1_GPIO_GP8, GPIO_IRQ_EDGE_FALL, bla_enabled);
 }
 
 void iod_call_btn2_intr_enabled(bool bla_enabled) {
-    gpio_set_irq_enabled(BTN2_GPIO_GP15, GPIO_IRQ_EDGE_FALL, bla_enabled);
+    gpio_set_irq_enabled(BTN2_GPIO_GP9, GPIO_IRQ_EDGE_FALL, bla_enabled);
 }
 
 // 内部関数
@@ -127,10 +127,10 @@ static void iod_port_filter(bool bla_value_now, struct iod_port_filter *psta_fil
 
 static void iod_port_intr_gpio(uint u32a_gpio, uint32_t u32a_events) {
     switch (u32a_gpio) {
-        case BTN1_GPIO_GP14:
+        case BTN1_GPIO_GP8:
             apl_intr_btn1_down();
             break;
-        case BTN2_GPIO_GP15:
+        case BTN2_GPIO_GP9:
             apl_intr_btn2_down();
             break;
     }
