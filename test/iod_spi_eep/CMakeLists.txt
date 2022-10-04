@@ -1,5 +1,5 @@
 add_executable(iod_spi_eep
-iod_spi_eep.c
+        iod_spi_eep.c
         )
 
 # pull in common dependencies
