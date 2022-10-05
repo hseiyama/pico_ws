@@ -7,6 +7,10 @@
 #define GPIO_GP7_PWM        (7)
 #define GPIO_GP8_PORT       (8)
 #define GPIO_GP9_PORT       (9)
+#define GPIO_GP10_I2C       (10)
+#define GPIO_GP11_I2C       (11)
+#define GPIO_GP12_I2C       (12)
+#define GPIO_GP13_I2C       (13)
 #define GPIO_GP16_SPI       (16)
 #define GPIO_GP17_SPI       (17)
 #define GPIO_GP18_SPI       (18)
@@ -67,7 +71,6 @@ extern void iod_adc_main_out();
 extern void iod_read_vrest_value(uint16_t *);
 extern void iod_read_gyro1_value(uint16_t *);
 extern void iod_read_gyro2_value(uint16_t *);
-
 // iod_pwm
 extern void iod_pwm_init();
 extern void iod_pwm_deinit();
@@ -107,6 +110,10 @@ extern void iod_i2c_main_in();
 extern void iod_i2c_main_out();
 extern bool iod_call_i2c_eep_read(uint8_t *, uint16_t);
 extern bool iod_call_i2c_eep_write(uint8_t *, uint16_t);
+// iod_i2c_gyro
+void iod_read_gyro_x_value(int16_t *);
+void iod_read_gyro_y_value(int16_t *);
+void iod_read_gyro_z_value(int16_t *);
 // iod_spi
 extern void iod_spi_init();
 extern void iod_spi_deinit();

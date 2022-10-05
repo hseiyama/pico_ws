@@ -12,6 +12,7 @@ add_executable(framework2
         iod_pwm.c
         iod_mcore.c
         iod_i2c.c
+        iod_i2c_gyro.c
         iod_spi.c
         iod_flash.c
         iod_wdog.c

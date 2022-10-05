@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "iod_main.h"
+#include "iod_i2c.h"
 
 #define I2C0_ID             i2c0
 #define I2C0_SDA_GPIO_GP20  GPIO_GP20_I2C
@@ -57,23 +58,29 @@ static bool iod_i2c_eep_isbusy();
 // 外部公開関数
 void iod_i2c_init() {
     iod_i2c_eep_init();
+    iod_i2c_gyro_init();
 }
 
 void iod_i2c_deinit() {
+    iod_i2c_gyro_deinit();
     iod_i2c_eep_deinit();
 }
 
 void iod_i2c_reinit() {
     iod_i2c_eep_reinit();
+    iod_i2c_gyro_reinit();
 }
 
 void iod_i2c_main_1ms() {
+    iod_i2c_gyro_main_1ms();
 }
 
 void iod_i2c_main_in() {
+    iod_i2c_gyro_main_in();
 }
 
 void iod_i2c_main_out() {
+    iod_i2c_gyro_main_out();
 }
 
 bool iod_call_i2c_eep_read(uint8_t *pu8a_buffer, uint16_t u16a_size) {

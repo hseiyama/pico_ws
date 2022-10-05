@@ -229,19 +229,26 @@ static void monitor_main() {
     uint16_t u16a_in_vrest_value;
     uint16_t u16a_in_gyro1_value;
     uint16_t u16a_in_gyro2_value;
+    int16_t s16a_in_gyro_x_value;
+    int16_t s16a_in_gyro_y_value;
+    int16_t s16a_in_gyro_z_value;
 
     // 入力処理
     iod_read_vrest_value(&u16a_in_vrest_value);
     iod_read_gyro1_value(&u16a_in_gyro1_value);
     iod_read_gyro2_value(&u16a_in_gyro2_value);
+    iod_read_gyro_x_value(&s16a_in_gyro_x_value);
+    iod_read_gyro_y_value(&s16a_in_gyro_y_value);
+    iod_read_gyro_z_value(&s16a_in_gyro_z_value);
 
     // 監視タイマーが満了した場合
     if (sys_call_timer_check(&sts_monitor_timer, 200)) {
         //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "2000ms Pass(%lld)\r\n", time_us_64());
         //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "adc value = 0x%04x\r\n", u16a_in_vrest_value);
-        int16_t s16a_gyro1 = u16a_in_gyro1_value - 0x0750;
-        int16_t s16a_gyro2 = u16a_in_gyro2_value - 0x0750;
-        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro(1, 2) = (%d, %d)\r\n", s16a_gyro1, s16a_gyro2);
+        //int16_t s16a_gyro1 = u16a_in_gyro1_value - 0x0750;
+        //int16_t s16a_gyro2 = u16a_in_gyro2_value - 0x0750;
+        //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro(1, 2) = (%d, %d)\r\n", s16a_gyro1, s16a_gyro2);
+        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro = %d, %d, %d\r\n", s16a_in_gyro_x_value, s16a_in_gyro_y_value, s16a_in_gyro_z_value);
         iod_call_uart_transmit(au8g_tx_message);
         // 監視タイマーの再開
         sys_call_timer_start(&sts_monitor_timer);
