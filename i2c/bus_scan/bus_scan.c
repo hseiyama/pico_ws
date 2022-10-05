@@ -25,6 +25,7 @@
 #include "pico/binary_info.h"
 #include "hardware/i2c.h"
 
+#define PICO_I2C_PORT i2c0
 #define PICO_I2C_SDA_PIN (20)
 #define PICO_I2C_SCL_PIN (21)
 
@@ -42,7 +43,7 @@ int main() {
     puts("Default I2C pins were not defined");
 #else
     // This example will use I2C0 on the default SDA and SCL pins (GP4, GP5 on a Pico)
-    i2c_init(i2c_default, 100 * 1000);
+    i2c_init(PICO_I2C_PORT, 100 * 1000);
     gpio_set_function(PICO_I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(PICO_I2C_SCL_PIN, GPIO_FUNC_I2C);
     //gpio_pull_up(PICO_I2C_SDA_PIN);
@@ -69,7 +70,7 @@ int main() {
         if (reserved_addr(addr))
             ret = PICO_ERROR_GENERIC;
         else
-            ret = i2c_read_blocking(i2c_default, addr, &rxdata, 1, false);
+            ret = i2c_read_blocking(PICO_I2C_PORT, addr, &rxdata, 1, false);
 
         printf(ret < 0 ? "." : "@");
         printf(addr % 16 == 15 ? "\n" : "  ");
