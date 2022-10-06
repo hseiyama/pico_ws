@@ -97,8 +97,17 @@ void apl_main() {
 void apl_intr_btn1_down() {
     iod_call_uart_transmit("interrupt btn1\r\n");
 }
+
 void apl_intr_btn2_down() {
     iod_call_uart_transmit("interrupt btn2\r\n");
+}
+
+void apl_intr_gyro_intr1() {
+    iod_call_uart_transmit("interrupt gyro1\r\n");
+}
+
+void apl_intr_gyro_intr2() {
+    iod_call_uart_transmit("interrupt gyro2\r\n");
 }
 
 // 内部関数

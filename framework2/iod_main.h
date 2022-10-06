@@ -3,6 +3,8 @@
 #define GPIO_GP1_UART       (1)
 #define GPIO_GP2_PORT       (2)
 #define GPIO_GP3_PORT       (3)
+#define GPIO_GP4_PORT       (4)
+#define GPIO_GP5_PORT       (5)
 #define GPIO_GP6_PWM        (6)
 #define GPIO_GP7_PWM        (7)
 #define GPIO_GP8_PORT       (8)

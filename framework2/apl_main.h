@@ -82,6 +82,8 @@ extern void apl_reinit();
 extern void apl_main();
 extern void apl_intr_btn1_down();
 extern void apl_intr_btn2_down();
+extern void apl_intr_gyro_intr1();
+extern void apl_intr_gyro_intr2();
 // apl_request
 extern void apl_request_init();
 extern void apl_request_deinit();

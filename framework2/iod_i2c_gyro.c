@@ -12,19 +12,35 @@
 
 // L3GD20H のアドレス
 // Address 7bit: SlaveAddress=0b1101010
-#define GYRO_ADDRESS        (0b01101010)
+#define GYRO_ADDRESS            (0b01101010)
 // L3GD20H のレジスタアドレス
-#define GYRO_REG_CTRL1      (0x20)
-#define GYRO_REG_CTRL2      (0x21)
-#define GYRO_REG_CTRL3      (0x22)
-#define GYRO_REG_CTRL4      (0x23)
-#define GYRO_REG_CTRL5      (0x24)
-#define GYRO_REG_OUT_X_L    (0x28)
-#define GYRO_REG_OUT_X_H    (0x29)
-#define GYRO_REG_OUT_Y_L    (0x2A)
-#define GYRO_REG_OUT_Y_H    (0x2B)
-#define GYRO_REG_OUT_Z_L    (0x2C)
-#define GYRO_REG_OUT_Z_H    (0x2D)
+#define GYRO_REG_WHO_AM_I       (0x0F)
+#define GYRO_REG_CTRL1          (0x20)
+#define GYRO_REG_CTRL2          (0x21)
+#define GYRO_REG_CTRL3          (0x22)
+#define GYRO_REG_CTRL4          (0x23)
+#define GYRO_REG_CTRL5          (0x24)
+#define GYRO_REG_REFERENCE      (0x25)
+#define GYRO_REG_OUT_TEMP       (0x26)
+#define GYRO_REG_STATUS         (0x27)
+#define GYRO_REG_OUT_X_L        (0x28)
+#define GYRO_REG_OUT_X_H        (0x29)
+#define GYRO_REG_OUT_Y_L        (0x2A)
+#define GYRO_REG_OUT_Y_H        (0x2B)
+#define GYRO_REG_OUT_Z_L        (0x2C)
+#define GYRO_REG_OUT_Z_H        (0x2D)
+#define GYRO_REG_FIFO_CTRL      (0x2E)
+#define GYRO_REG_FIFO_SRC       (0x2F)
+#define GYRO_REG_IG_CFG         (0x30)
+#define GYRO_REG_IG_SRC         (0x31)
+#define GYRO_REG_IG_THS_XH      (0x32)
+#define GYRO_REG_IG_THS_XL      (0x33)
+#define GYRO_REG_IG_THS_YH      (0x34)
+#define GYRO_REG_IG_THS_YL      (0x35)
+#define GYRO_REG_IG_THS_ZH      (0x36)
+#define GYRO_REG_IG_THS_ZL      (0x37)
+#define GYRO_REG_IG_DURATION    (0x38)
+#define GYRO_REG_LOW_ODR        (0x39)
 
 enum iod_i2c_gyro_group {
     GYRO_X = 0,
@@ -65,10 +81,13 @@ void iod_i2c_gyro_init() {
     gpio_put(I2C1_ADR_GPIO_GP12, false);
     gpio_put(I2C1_CSN_GPIO_GP13, true);
 
-    // L3GD20H設定（CTRL1レジスタ PD=1：通常モード）
-    iod_i2c_gyro_write(GYRO_REG_CTRL1, 0x0F);
-    // L3GD20H設定（CTRL4レジスタ FS1-FS0=10：2000dps）
-    iod_i2c_gyro_write(GYRO_REG_CTRL4, 0x20);
+    // L3GD20H設定
+    iod_i2c_gyro_write(GYRO_REG_CTRL4, 0x20); // FS1-FS0=1x: 2000 dps
+    iod_i2c_gyro_write(GYRO_REG_CTRL3, 0xA0); // INT1_IG=1: enable on INT1 pin, H_Lactive=1: low
+    iod_i2c_gyro_write(GYRO_REG_IG_CFG, 0x20); // ZHIE=1: enable interrupt request on measured angular rate value higher than preset threshold
+    iod_i2c_gyro_write(GYRO_REG_IG_THS_ZH, 0x40); // THSZ14-THSZ8=100 0000: Interrupt threshold on Z axis
+    iod_i2c_gyro_write(GYRO_REG_IG_THS_ZL, 0x00); // THSZ7-THSZ0=0000 0000: Interrupt threshold on Z axis
+    iod_i2c_gyro_write(GYRO_REG_CTRL1, 0x0F); // PD=1: Normal Mode
 }
 
 void iod_i2c_gyro_deinit() {

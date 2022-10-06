@@ -5,6 +5,8 @@
 #define IOD_PORT_FLT_NUM    (4)
 
 #define BTN0_GPIO_GP2       GPIO_GP2_PORT
+#define INTR1_GPIO_GP4      GPIO_GP4_PORT
+#define INTR2_GPIO_GP5      GPIO_GP5_PORT
 #define BTN1_GPIO_GP8       GPIO_GP8_PORT
 #define BTN2_GPIO_GP9       GPIO_GP9_PORT
 #define LED0_GPIO_GP25      GPIO_GP25_PORT
@@ -42,6 +44,11 @@ void iod_port_init() {
     // 注意２：gpio_set_irq_enabled_with_callback()では、最初にtrueを指定する必要あり
     gpio_set_irq_enabled_with_callback(BTN1_GPIO_GP8, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
     gpio_set_irq_enabled_with_callback(BTN2_GPIO_GP9, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
+    // GPIO(GP4, 5)の割り込み設定（プルアップ）
+    iod_port_set_in(INTR1_GPIO_GP4, PORT_PULL_UP);
+    iod_port_set_in(INTR2_GPIO_GP5, PORT_PULL_UP);
+    gpio_set_irq_enabled_with_callback(INTR1_GPIO_GP4, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
+    gpio_set_irq_enabled_with_callback(INTR2_GPIO_GP5, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
 
     // GPIO(GP2)のフィルタ初期設定
     sts_btn0_filter.bl_value = IOD_BTN0_VALUE_INIT;
@@ -127,11 +134,17 @@ static void iod_port_filter(bool bla_value_now, struct iod_port_filter *psta_fil
 
 static void iod_port_intr_gpio(uint u32a_gpio, uint32_t u32a_events) {
     switch (u32a_gpio) {
-        case BTN1_GPIO_GP8:
-            apl_intr_btn1_down();
-            break;
-        case BTN2_GPIO_GP9:
-            apl_intr_btn2_down();
-            break;
+    case BTN1_GPIO_GP8:
+        apl_intr_btn1_down();
+        break;
+    case BTN2_GPIO_GP9:
+        apl_intr_btn2_down();
+        break;
+    case INTR1_GPIO_GP4:
+        apl_intr_gyro_intr1();
+        break;
+    case INTR2_GPIO_GP5:
+        apl_intr_gyro_intr2();
+        break;
     }
 }
