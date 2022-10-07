@@ -45,8 +45,8 @@ void iod_port_init() {
     gpio_set_irq_enabled_with_callback(BTN1_GPIO_GP8, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
     gpio_set_irq_enabled_with_callback(BTN2_GPIO_GP9, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
     // GPIO(GP4, 5)の割り込み設定（プルアップ）
-    iod_port_set_in(INTR1_GPIO_GP4, PORT_PULL_UP);
-    iod_port_set_in(INTR2_GPIO_GP5, PORT_PULL_UP);
+    gpio_pull_up(INTR1_GPIO_GP4);
+    gpio_pull_up(INTR2_GPIO_GP5);
     gpio_set_irq_enabled_with_callback(INTR1_GPIO_GP4, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
     gpio_set_irq_enabled_with_callback(INTR2_GPIO_GP5, GPIO_IRQ_EDGE_FALL, true, &iod_port_intr_gpio);
 
