@@ -26,6 +26,11 @@
 // Address 7bit: ControlCode=0b1010xxx, ChipSelectBits=0bxxxx100
 #define EEP_ADDRESS         (0b01010100)
 
+// 読み出し操作（ページ読み出し）
+#define EEP_READ_SIZE       (2)
+// 書き込み操作（ページ書き込み）
+#define EEP_WRITE_SIZE      (2)
+
 struct iod_i2c_eep_buffer {
     uint32_t u32_header;
     uint8_t au8_data[I2C_EEP_DATA_SIZE];
@@ -208,11 +213,11 @@ static void iod_i2c_eep_block_read(uint16_t u16a_address, uint8_t *pu8a_buffer, 
 }
 
 static void iod_i2c_eep_read(uint16_t u16a_address, uint8_t *pu8a_buffer, uint16_t u16a_size) {
-    // 読み出し操作コマンド（順次読み出し）
+    // 読み出し操作コマンド（ページ読み出し）
     au8s_tx_buffer[0] = (u16a_address >> 8) & 0xFF;
     au8s_tx_buffer[1] = u16a_address & 0xFF;
     // 読み出し操作
-    i2c_write_blocking(I2C0_ID, EEP_ADDRESS, au8s_tx_buffer, 2, true);
+    i2c_write_blocking(I2C0_ID, EEP_ADDRESS, au8s_tx_buffer, EEP_READ_SIZE, true);
     i2c_read_blocking(I2C0_ID, EEP_ADDRESS, pu8a_buffer, u16a_size, false);
 }
 
@@ -237,9 +242,9 @@ static void iod_i2c_eep_write(uint16_t u16a_address, uint8_t *pu8a_buffer, uint1
     // 書き込み操作コマンド（ページ書き込み）
     au8s_tx_buffer[0] = (u16a_address >> 8) & 0xFF;
     au8s_tx_buffer[1] = u16a_address & 0xFF;
-    memcpy(&au8s_tx_buffer[2], pu8a_buffer, u16a_size);
+    memcpy(&au8s_tx_buffer[EEP_WRITE_SIZE], pu8a_buffer, u16a_size);
     // 書き込み操作
-    i2c_write_blocking(I2C0_ID, EEP_ADDRESS, au8s_tx_buffer, u16a_size + 2, false);
+    i2c_write_blocking(I2C0_ID, EEP_ADDRESS, au8s_tx_buffer, u16a_size + EEP_WRITE_SIZE, false);
 }
 
 static bool iod_i2c_eep_isbusy() {
