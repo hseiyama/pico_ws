@@ -1,3 +1,11 @@
+// 機能選択オプション
+#define SELECT_I2C_GYRO     true
+#define SELECT_SPI_GYRO     false
+/* 定義の整合チェック */
+#if SELECT_I2C_GYRO && SELECT_SPI_GYRO
+#error SELECT_I2C_GYRO and SELECT_SPI_GYRO is not true.
+#endif
+
 // IOD内部用
 #define GPIO_GP0_UART       (0)
 #define GPIO_GP1_UART       (1)
@@ -9,10 +17,18 @@
 #define GPIO_GP7_PWM        (7)
 #define GPIO_GP8_PORT       (8)
 #define GPIO_GP9_PORT       (9)
+#if SELECT_I2C_GYRO
 #define GPIO_GP10_I2C       (10)
 #define GPIO_GP11_I2C       (11)
 #define GPIO_GP12_I2C       (12)
 #define GPIO_GP13_I2C       (13)
+#endif
+#if SELECT_SPI_GYRO
+#define GPIO_GP12_SPI       (12)
+#define GPIO_GP13_SPI       (13)
+#define GPIO_GP14_SPI       (14)
+#define GPIO_GP15_SPI       (15)
+#endif
 #define GPIO_GP16_SPI       (16)
 #define GPIO_GP17_SPI       (17)
 #define GPIO_GP18_SPI       (18)
@@ -24,9 +40,9 @@
 #define GPIO_GP27_ADC       (27)
 #define GPIO_GP28_ADC       (28)
 /// 外部公開用
-#define IOD_BTN0_VALUE_INIT     (true)
-#define IOD_LED0_VALUE_INIT     (true)
-#define IOD_LED1_VALUE_INIT     (true)
+#define IOD_BTN0_VALUE_INIT     true
+#define IOD_LED0_VALUE_INIT     true
+#define IOD_LED1_VALUE_INIT     true
 #define IOD_UART_BUFF_SIZE      (32 + 1)
 #define IOD_ADC_VALUE_MAX       (0x0FFF)
 #define IOD_PWM0_DUTY_MAX       (25000) // PWM3_WRAP と一致させる
@@ -112,10 +128,6 @@ extern void iod_i2c_main_in();
 extern void iod_i2c_main_out();
 extern bool iod_call_i2c_eep_read(uint8_t *, uint16_t);
 extern bool iod_call_i2c_eep_write(uint8_t *, uint16_t);
-// iod_i2c_gyro
-void iod_read_gyro_x_value(int16_t *);
-void iod_read_gyro_y_value(int16_t *);
-void iod_read_gyro_z_value(int16_t *);
 // iod_spi
 extern void iod_spi_init();
 extern void iod_spi_deinit();
@@ -125,6 +137,10 @@ extern void iod_spi_main_in();
 extern void iod_spi_main_out();
 extern bool iod_call_spi_eep_read(uint8_t *, uint16_t);
 extern bool iod_call_spi_eep_write(uint8_t *, uint16_t);
+// iod_i2c_gyro, iod_spi_gyro
+void iod_read_gyro_x_value(int16_t *);
+void iod_read_gyro_y_value(int16_t *);
+void iod_read_gyro_z_value(int16_t *);
 // iod_flash
 extern void iod_flash_init();
 extern void iod_flash_deinit();

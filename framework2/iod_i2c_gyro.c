@@ -42,6 +42,15 @@
 #define GYRO_REG_IG_DURATION    (0x38)
 #define GYRO_REG_LOW_ODR        (0x39)
 
+// 読み出し操作オプション（複数バイト読み出し）
+// READ MSb=1 RegisterAddress=7bit
+#define GYRO_READ_OPT           (0b10000000)
+#define GYRO_READ_SIZE          (1)
+// 書き込み操作オプション（1バイト書き込み）
+// WRITE MSb=0 RegisterAddress=7bit
+#define GYRO_WRITE_OPT          (0b00000000)
+#define GYRO_WRITE_SIZE         (2)
+
 enum iod_i2c_gyro_group {
     GYRO_X = 0,
     GYRO_Y,
@@ -49,7 +58,7 @@ enum iod_i2c_gyro_group {
     GYRO_GROUP_NUM
 };
 
-const uint8_t acu8s_gyro_address[GYRO_GROUP_NUM] = {
+static const uint8_t acu8s_gyro_address[GYRO_GROUP_NUM] = {
     GYRO_REG_OUT_X_L,
     GYRO_REG_OUT_Y_L,
     GYRO_REG_OUT_Z_L
@@ -66,6 +75,7 @@ void iod_i2c_gyro_init() {
     memset(as16s_gyro_value, 0, sizeof(as16s_gyro_value));
     memset(au8s_tx_buffer, 0, sizeof(au8s_tx_buffer));
 
+#if SELECT_I2C_GYRO
     // I2C1の初期設定（クロックは 400KHz）
     i2c_init(I2C1_ID, 400*1000);
     gpio_set_function(I2C1_SDA_GPIO_GP10, GPIO_FUNC_I2C);
@@ -88,6 +98,7 @@ void iod_i2c_gyro_init() {
     iod_i2c_gyro_write(GYRO_REG_IG_THS_ZH, 0x40); // THSZ14-THSZ8=100 0000: Interrupt threshold on Z axis
     iod_i2c_gyro_write(GYRO_REG_IG_THS_ZL, 0x00); // THSZ7-THSZ0=0000 0000: Interrupt threshold on Z axis
     iod_i2c_gyro_write(GYRO_REG_CTRL1, 0x0F); // PD=1: Normal Mode
+#endif
 }
 
 void iod_i2c_gyro_deinit() {
@@ -100,16 +111,19 @@ void iod_i2c_gyro_main_1ms() {
 }
 
 void iod_i2c_gyro_main_in() {
+#if SELECT_I2C_GYRO
     uint8_t u8a_index;
 
     for (u8a_index = 0;u8a_index < GYRO_GROUP_NUM; u8a_index++) {
         iod_i2c_gyro_read(acu8s_gyro_address[u8a_index], (uint8_t *)&as16s_gyro_value[u8a_index], sizeof(int16_t));
     }
+#endif
 }
 
 void iod_i2c_gyro_main_out() {
 }
 
+#if SELECT_I2C_GYRO
 void iod_read_gyro_x_value(int16_t *ps16a_value) {
     *ps16a_value = as16s_gyro_value[GYRO_X];
 }
@@ -121,20 +135,23 @@ void iod_read_gyro_y_value(int16_t *ps16a_value) {
 void iod_read_gyro_z_value(int16_t *ps16a_value) {
     *ps16a_value = as16s_gyro_value[GYRO_Z];
 }
+#endif
 
 // 内部関数
+#if SELECT_I2C_GYRO
 static void iod_i2c_gyro_read(uint8_t u8a_address, uint8_t *pu8a_buffer, uint8_t u8a_size) {
     // 読み出し操作コマンド（複数バイト読み出し）
-    au8s_tx_buffer[0] = u8a_address | 0x80;
+    au8s_tx_buffer[0] = (u8a_address & 0x7F) | GYRO_READ_OPT;
     // 読み出し操作
-    i2c_write_blocking(I2C1_ID, GYRO_ADDRESS, au8s_tx_buffer, 1, true);
+    i2c_write_blocking(I2C1_ID, GYRO_ADDRESS, au8s_tx_buffer, GYRO_READ_SIZE, true);
     i2c_read_blocking(I2C1_ID, GYRO_ADDRESS, pu8a_buffer, u8a_size, false);
 }
 
 static void iod_i2c_gyro_write(uint8_t u8a_address, uint8_t u8a_data) {
     // 書き込み操作コマンド（1バイト書き込み）
-    au8s_tx_buffer[0] = u8a_address;
+    au8s_tx_buffer[0] = (u8a_address & 0x7F) | GYRO_WRITE_OPT;
     au8s_tx_buffer[1] = u8a_data;
     // 書き込み操作
-    i2c_write_blocking(I2C1_ID, GYRO_ADDRESS, au8s_tx_buffer, 2, false);
+    i2c_write_blocking(I2C1_ID, GYRO_ADDRESS, au8s_tx_buffer, GYRO_WRITE_SIZE, false);
 }
+#endif
