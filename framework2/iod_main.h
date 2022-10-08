@@ -1,9 +1,9 @@
 // 機能選択オプション
-#define SELECT_I2C_GYRO     true
-#define SELECT_SPI_GYRO     false
+#define SELECT_I2C_GYRO     false
+#define SELECT_SPI_GYRO     true
 /* 定義の整合チェック */
 #if SELECT_I2C_GYRO && SELECT_SPI_GYRO
-#error SELECT_I2C_GYRO and SELECT_SPI_GYRO is not true.
+#error Both SELECT_I2C_GYRO and SELECT_SPI_GYRO is true.
 #endif
 
 // IOD内部用
