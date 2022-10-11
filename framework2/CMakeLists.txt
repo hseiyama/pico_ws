@@ -14,6 +14,7 @@ add_executable(framework2
         iod_i2c.c
         iod_i2c_eep.c
         iod_i2c_gyro.c
+        iod_i2c_6axis.c
         iod_spi.c
         iod_spi_eep.c
         iod_spi_gyro.c

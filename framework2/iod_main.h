@@ -1,9 +1,13 @@
 // 機能選択オプション
 #define SELECT_I2C_GYRO     false
 #define SELECT_SPI_GYRO     true
+#define SELECT_I2C_6AXIS    true
 /* 定義の整合チェック */
 #if SELECT_I2C_GYRO && SELECT_SPI_GYRO
 #error Both SELECT_I2C_GYRO and SELECT_SPI_GYRO is true.
+#endif
+#if SELECT_I2C_GYRO && SELECT_I2C_6AXIS
+#error Both SELECT_I2C_GYRO and SELECT_I2C_6AXIS is true.
 #endif
 
 // IOD内部用
@@ -22,6 +26,10 @@
 #define GPIO_GP11_I2C       (11)
 #define GPIO_GP12_I2C       (12)
 #define GPIO_GP13_I2C       (13)
+#endif
+#if SELECT_I2C_6AXIS
+#define GPIO_GP10_I2C       (10)
+#define GPIO_GP11_I2C       (11)
 #endif
 #if SELECT_SPI_GYRO
 #define GPIO_GP12_SPI       (12)
@@ -141,6 +149,13 @@ extern bool iod_call_spi_eep_write(uint8_t *, uint16_t);
 void iod_read_gyro_x_value(int16_t *);
 void iod_read_gyro_y_value(int16_t *);
 void iod_read_gyro_z_value(int16_t *);
+// iod_i2c_6axis
+void iod_read_6axis_accel_x_value(int16_t *);
+void iod_read_6axis_accel_y_value(int16_t *);
+void iod_read_6axis_accel_z_value(int16_t *);
+void iod_read_6axis_gyro_x_value(int16_t *);
+void iod_read_6axis_gyro_y_value(int16_t *);
+void iod_read_6axis_gyro_z_value(int16_t *);
 // iod_flash
 extern void iod_flash_init();
 extern void iod_flash_deinit();

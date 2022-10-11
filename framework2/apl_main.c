@@ -241,6 +241,12 @@ static void monitor_main() {
     int16_t s16a_in_gyro_x_value;
     int16_t s16a_in_gyro_y_value;
     int16_t s16a_in_gyro_z_value;
+    int16_t s16a_in_6axis_accel_x;
+    int16_t s16a_in_6axis_accel_y;
+    int16_t s16a_in_6axis_accel_z;
+    int16_t s16a_in_6axis_gyro_x;
+    int16_t s16a_in_6axis_gyro_y;
+    int16_t s16a_in_6axis_gyro_z;
 
     // 入力処理
     iod_read_vrest_value(&u16a_in_vrest_value);
@@ -249,6 +255,14 @@ static void monitor_main() {
     iod_read_gyro_x_value(&s16a_in_gyro_x_value);
     iod_read_gyro_y_value(&s16a_in_gyro_y_value);
     iod_read_gyro_z_value(&s16a_in_gyro_z_value);
+#if SELECT_I2C_6AXIS
+    iod_read_6axis_accel_x_value(&s16a_in_6axis_accel_x);
+    iod_read_6axis_accel_y_value(&s16a_in_6axis_accel_y);
+    iod_read_6axis_accel_z_value(&s16a_in_6axis_accel_z);
+    iod_read_6axis_gyro_x_value(&s16a_in_6axis_gyro_x);
+    iod_read_6axis_gyro_y_value(&s16a_in_6axis_gyro_y);
+    iod_read_6axis_gyro_z_value(&s16a_in_6axis_gyro_z);
+#endif
 
     // 監視タイマーが満了した場合
     if (sys_call_timer_check(&sts_monitor_timer, 200)) {
@@ -257,7 +271,11 @@ static void monitor_main() {
         //int16_t s16a_gyro1 = u16a_in_gyro1_value - 0x0750;
         //int16_t s16a_gyro2 = u16a_in_gyro2_value - 0x0750;
         //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro(1, 2) = (%d, %d)\r\n", s16a_gyro1, s16a_gyro2);
-        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro = %d, %d, %d\r\n", s16a_in_gyro_x_value, s16a_in_gyro_y_value, s16a_in_gyro_z_value);
+        //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro = %d, %d, %d\r\n", s16a_in_gyro_x_value, s16a_in_gyro_y_value, s16a_in_gyro_z_value);
+#if SELECT_I2C_6AXIS
+        snprintf(au8g_tx_message, sizeof(au8g_tx_message), "accel = %d, %d, %d\r\n", s16a_in_6axis_accel_x, s16a_in_6axis_accel_y, s16a_in_6axis_accel_z);
+        //snprintf(au8g_tx_message, sizeof(au8g_tx_message), "gyro = %d, %d, %d\r\n", s16a_in_6axis_gyro_x, s16a_in_6axis_gyro_y, s16a_in_6axis_gyro_z);
+#endif
         iod_call_uart_transmit(au8g_tx_message);
         // 監視タイマーの再開
         sys_call_timer_start(&sts_monitor_timer);
